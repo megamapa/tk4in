@@ -18,7 +18,7 @@ async function RandomNum(min, max) {
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
-async function SetSession(key, value) {  
+async function SetSession(res, key, value) {  
 	res.cookie(key, value, { domain: process.env.CKEBase, path: '/', secure: true })	
 }
 
@@ -28,7 +28,7 @@ async function GetSession(req, res) {
 			RandomNum(10,99).then(res3 => {
 				RandomNum(10,99).then(res4 => {
 					RandomNum(10199,99999).then(res5 => {
-						SetSession('_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5).then(res =>{return res});
+						SetSession(res, '_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5).then(result =>{return result});
 					});
 				});
 			});
