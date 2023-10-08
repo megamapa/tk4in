@@ -18,6 +18,20 @@ async function RandomNum(min, max) {
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
+async function GetSession(req, res) {
+	RandomNum(111,999).then(res1 => {
+    	RandomNum(20199,99199).then(res2 => {
+			RandomNum(10,99).then(res3 => {
+				RandomNum(10,99).then(res4 => {
+					RandomNum(10199,99999).then(res5 => {
+						res.cookie('_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true });
+						return true;
+					});
+				});
+			});
+		});
+	});
+}
 /****************************************************************************************************/
 /* Le as variáveis de ambiente																		*/
 /****************************************************************************************************/
@@ -73,21 +87,15 @@ httpsServer.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
-app.get('/', function(req, res)
-{	RandomNum(111,999).then(res1 => {
-    	RandomNum(20199,99199).then(res2 => {
-			RandomNum(10,99).then(res3 => {
-				RandomNum(10,99).then(res4 => {
-					RandomNum(10199,99999).then(res5 => {
-						res.cookie('_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true });
-					});
-				});
-			});
-		});
-	});
+app.get('/', function(req, res){	
+	GetSession(req, res).then(sess =>{
 
-	res.send('Hello there !');
-	//res.redirect('/login');
+	
+	
+		res.send('Hello there !');
+		//res.redirect('/login');
+		
+	});
 });
 
 /****************************************************************************************************/
