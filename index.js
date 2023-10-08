@@ -98,6 +98,7 @@ app.get('/', function(req, res){
   	if (session === undefined) {
 		GetUSID().then(USID=>{ 
 			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
+			res.send('Hello there !');
 		});
  	} else {
 
@@ -105,7 +106,6 @@ app.get('/', function(req, res){
 	}
 
 
-	res.send('Hello there !');
 	//res.redirect('/login')
 		
 	
