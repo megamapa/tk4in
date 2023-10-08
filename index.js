@@ -24,6 +24,7 @@ dotenv.config();
 /****************************************************************************************************/
 const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
+const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 
 // Publica STATUSD
 async function PublishUpdate() {
