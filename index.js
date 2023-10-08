@@ -18,13 +18,14 @@ async function RandomNum(min, max) {
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
-async function SetSession(res, key) {
+// Gera uma Unic Session ID
+async function GetUSID() {
 	RandomNum(111,999).then(res1 => {
     	RandomNum(20199,99199).then(res2 => {
 			RandomNum(10,99).then(res3 => {
 				RandomNum(10,99).then(res4 => {
 					RandomNum(10199,99999).then(res5 => {
-						return(res.cookie(key, 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true }));	
+						return('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);	
 					});
 				});
 			});
@@ -32,9 +33,6 @@ async function SetSession(res, key) {
 	});
 }
 
-async function GetSession(req, res) {
-	return await SetSession(res, '_tk_v');
-}
 /****************************************************************************************************/
 /* Le as variáveis de ambiente																		*/
 /****************************************************************************************************/
@@ -93,20 +91,24 @@ httpsServer.listen(443, () => {
 
 app.use(cookieParser());
 
-app.get('/', function(req, res){	
-	GetSession(req, res).then(sess =>{
-		
+app.get('/', function(req, res){
+	
+	// Verifica se a sessao exite 
+	var session = req.cookies._tk_v;
+  	if (session === undefined) {
+		GetUSID().then(USID=>{ 
+			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
+		});
+ 	} else {
 
 
-			res.send('Hello there !');
-			//res.redirect('/login');
-		
+	}
 
+
+	res.send('Hello there !');
+	//res.redirect('/login')
 		
 	
-	
-		
-	});
 });
 
 /****************************************************************************************************/
