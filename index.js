@@ -96,14 +96,14 @@ app.get('/', function(req, res){
 	// Verifica se a sessao exite 
 	var session = req.cookies._tk_v;
   	if (session === undefined) {
-		USID = GetUSID();
+		GetUSID().then((USID) => {
+			console.log(USID);
 
-		USID.then((value) => {
-			console.log(value);
-		  })
-		
 			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
 			res.send('Hello there !');
+
+		  });
+		
 		
  	} else {
 
