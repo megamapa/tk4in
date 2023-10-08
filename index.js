@@ -96,21 +96,19 @@ async function GetSession(req, res) {
 	};
 	// le o USID no cookie
 	let USID = req.cookies._tk_v;
-	// Verifica se existe
+	// Se nao tiver um cookie cria um novo
 	if (USID === undefined) {
 		USID = await GetUSID();
 		session.USID = USID;
-	} else {
-		hub.exists('ses:'+USID, function (err, result) {
-			if (result) {
-				session = hub.hGetAll('ses:'+USID);
-			} else {
-				session.USID = USID;	
-				hub.hSet('ses:'+USID, session);
-			}
-		});
-
 	}
+	// Verifica se tem uma sessao no redis
+	if (await hub.exists('ses:'+USID)) {
+		session = await hub.hGetAll('ses:'+USID);
+	} else {
+		session.USID = USID;
+		await hub.hSet('ses:'+USID, session);
+	}
+	// Retorna a sessao
 	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
