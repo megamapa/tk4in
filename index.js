@@ -64,7 +64,6 @@ const cookieParser = require('cookie-parser');
 const helmet = require("helmet");
 const app = express();
 const {	randomBytes } = require('node:crypto');
-const useragent = require('express-useragent');
 
 // Certificado
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/tk4.in/privkey.pem', 'utf8');
@@ -97,7 +96,7 @@ async function GetSession(req, res) {
 		lang : "en-US",
 		map : 'MB',
 		mapset : ['MB'],
-		useragent : {},
+		useragent : "",
 	};
 	// le o USID no cookie
 	let USID = req.cookies._tk_v;
@@ -108,7 +107,7 @@ async function GetSession(req, res) {
 		session = await hub.hgetall('ses:'+USID);
 	} else {
 		session.USID = USID;
-		session.useragent = req.useragent;
+		session.useragent = req.get('User-Agent');
 		await hub.hset('ses:'+USID, session);
 	}
 	// Retorna a sessao
@@ -159,7 +158,7 @@ async function MakeIndex(req, res) {
 
 
 app.use(cookieParser());
-app.use(useragent.express());
+
 app.get('/', function(req, res){
 
 
