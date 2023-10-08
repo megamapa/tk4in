@@ -20,18 +20,12 @@ async function RandomNum(min, max) {
 
 // Gera uma Unic Session ID
 async function GetUSID() {
-	RandomNum(111,999).then(res1 => {
-    	RandomNum(20199,99199).then(res2 => {
-			RandomNum(10,99).then(res3 => {
-				RandomNum(10,99).then(res4 => {
-					RandomNum(10199,99999).then(res5 => {
-						console.log('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);
-						return('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);
-					});
-				});
-			});
-		});
-	});
+	res1 = await RandomNum(111,999);
+    res2 = await RandomNum(20199,99199);
+	res3 = await RandomNum(10,99);
+	res4 = await RandomNum(10,99);
+	res5 = await RandomNum(10199,99999);
+	return('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);
 }
 
 /****************************************************************************************************/
