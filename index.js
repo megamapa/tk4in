@@ -98,8 +98,10 @@ app.get('/', function(req, res){
   	if (session === undefined) {
 		USID = GetUSID();
 
-	
-			console.log(USID);
+		USID.then((value) => {
+			console.log(value);
+		  })
+		
 			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
 			res.send('Hello there !');
 		
