@@ -103,10 +103,10 @@ async function GetSession(req, res) {
 	}
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
-		session = await hub.hGetAll('ses:'+USID);
+		session = await hub.hgetall('ses:'+USID);
 	} else {
 		session.USID = USID;
-		await hub.hSet('ses:'+USID, session);
+		await hub.hset('ses:'+USID, session);
 	}
 	// Retorna a sessao
 	console.log(JSON.stringify(session, null, 2));
