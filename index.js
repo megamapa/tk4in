@@ -99,7 +99,6 @@ async function GetSession(req, res) {
 	// Verifica se existe
 	if (USID === undefined) {
 		USID = await GetUSID();
-		console.log(USID);
 		session.USID = USID;
 	} else {
 		hub.exists('ses:'+USID, function (err, result) {
@@ -112,6 +111,7 @@ async function GetSession(req, res) {
 		});
 
 	}
+	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 
