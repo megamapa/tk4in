@@ -67,6 +67,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const app = express();
 
 // Certificado
@@ -89,6 +90,8 @@ httpServer.listen(80, () => {
 httpsServer.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
+
+app.use(express.cookieParser());
 
 app.get('/', function(req, res){	
 	GetSession(req, res).then(sess =>{
