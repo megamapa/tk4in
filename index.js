@@ -24,7 +24,7 @@ async function SetSession(res, key) {
 			RandomNum(10,99).then(res3 => {
 				RandomNum(10,99).then(res4 => {
 					RandomNum(10199,99999).then(res5 => {
-						res.cookie(key, 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true }).then(sess => {return sess})	
+						return(res.cookie(key, 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true }));	
 					});
 				});
 			});
