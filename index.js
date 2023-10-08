@@ -18,22 +18,22 @@ async function RandomNum(min, max) {
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
-async function SetSession(res, key, value) {  
-	res.cookie(key, value, { domain: process.env.CKEBase, path: '/', secure: true })	
-}
-
-async function GetSession(req, res) {
+async function SetSession(res, key) {
 	RandomNum(111,999).then(res1 => {
     	RandomNum(20199,99199).then(res2 => {
 			RandomNum(10,99).then(res3 => {
 				RandomNum(10,99).then(res4 => {
 					RandomNum(10199,99999).then(res5 => {
-						SetSession(res, '_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5).then(result =>{return result});
+						res.cookie(key, 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true })	
 					});
 				});
 			});
 		});
 	});
+}
+
+async function GetSession(req, res) {
+	await SetSession(res, '_tk_v');
 }
 /****************************************************************************************************/
 /* Le as variáveis de ambiente																		*/
