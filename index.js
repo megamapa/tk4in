@@ -57,10 +57,12 @@ hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.
 /* Inicializa o express																		        */
 /****************************************************************************************************/
 const fs = require('fs');
+const crypto = require('crypto');
 const http = require('http');
 const https = require('https');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const helmet = require("helmet");
 const app = express();
 
 // Certificado
@@ -91,8 +93,9 @@ async function GetSession(req, res) {
 		USID : '',
 		start: await GetDate(),
 		login : '*',
+		lang : "en-US",
 		map : 'MB',
-		mapset : ['MB','GM','MM'],
+		mapset : ['MB'],
 	};
 	// le o USID no cookie
 	let USID = req.cookies._tk_v;
@@ -114,12 +117,41 @@ async function GetSession(req, res) {
 }
 
 async function MakeIndex(req, res) {
+	// Gera noonce
+	const nonce = crypto.randomBytes(64).toString('base64');
+	// Cria os Headers
+	app.use(helmet({
+		referrerPolicy: {
+							policy: "no-referrer-when-downgrade",
+		},
+		contentSecurityPolicy:{
+			directives: {
+				"default-src": ["'self'"],
+				"base-uri": ["'self'"],
+				  "font-src": ["cdnjs.cloudflare.com/ajax/libs/font-awesome/"],
+				"connect-src": ["'self'","*.mapbox.com/"],
+				"script-src": ["'report-sample'", "'nonce-"+nonce+"'", "cdn.jsdelivr.net/npm/", CDNBase],
+				"style-src": ["'self'", "report-sample'", "cdn.jsdelivr.net/npm/", CDNBase],
+				"object-src": ["'none'"],
+				"frame-src": ["'self'"],
+				"frame-ancestors": ["'none'"],
+				"img-src": ["'self'", CDNBase],
+				"form-action": ["'self'"],
+				"media-src": ["'self'"],
+				"worker-src": ["'self'"]
+			}
+		},
+		
+	  })
+	);
 	// Pega sessao
 	GetSession(req).then(session => {
-
+		// Envia cookie da sessao
 		res.cookie('_tk_v', session.USID, { domain: process.env.CKEBase, path: '/', secure: true });
+		// 
+		
 
-
+		  
 
 		res.send('Hello there !');
 	});
@@ -129,6 +161,7 @@ async function MakeIndex(req, res) {
 app.use(cookieParser());
 
 app.get('/', function(req, res){
+
 
 	MakeIndex(req, res);
 
