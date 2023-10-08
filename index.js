@@ -57,13 +57,13 @@ hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.
 /* Inicializa o express																		        */
 /****************************************************************************************************/
 const fs = require('fs');
-const crypto = require('crypto');
 const http = require('http');
 const https = require('https');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const helmet = require("helmet");
 const app = express();
+const {	randomBytes } = require('node:crypto');
 
 // Certificado
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/tk4.in/privkey.pem', 'utf8');
@@ -118,11 +118,11 @@ async function GetSession(req, res) {
 
 async function MakeIndex(req, res) {
 	// Gera noonce
-	const nonce = crypto.randomBytes(64).toString('base64');
+	const nonce = randomBytes(64).toString('base64');
 	// Cria os Headers
 	app.use(helmet({
 		referrerPolicy: {
-							policy: "no-referrer-when-downgrade",
+				policy: "no-referrer-when-downgrade",
 		},
 		contentSecurityPolicy:{
 			directives: {
