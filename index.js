@@ -4,7 +4,7 @@
 /****************************************************************************************************/
 process.title = 'tk4in';
 const Version = '2.0.0';
-var starttime;
+var starttime,USID;
 
 /****************************************************************************************************/
 /* Funcoes uteis   																					*/
@@ -19,7 +19,7 @@ async function RandomNum(min, max) {
 }
 
 // Gera uma Unic Session ID
-function GetUSID() {
+async function GetUSID() {
 	RandomNum(111,999).then(res1 => {
     	RandomNum(20199,99199).then(res2 => {
 			RandomNum(10,99).then(res3 => {
@@ -89,30 +89,59 @@ httpsServer.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
+
+async function GetSession(req, res) {
+	// Inicializa a sessao
+	let	session = {
+		USID : '',
+		start: await GetDate(),
+		login : '*',
+		map : 'MB',
+		mapset : ['MB','GM','MM'],
+	};
+	// le o USID no cookie
+	let USID = req.cookies._tk_v;
+	// Verifica se existe
+	if (USID === undefined) {
+		USID = await GetUSID();
+		console.log(USID);
+		session.USID = USID;
+	} else {
+		hub.exists('ses:'+USID, function (err, result) {
+			if (result) {
+				session = hub.hGetAll('ses:'+USID);
+			} else {
+				session.USID = USID;	
+				hub.hSet('ses:'+USID, session);
+			}
+		});
+
+	}
+	return(session);
+}
+
+async function MakeIndex(req, res) {
+	// Pega sessao
+	GetSession(req).then(session => {
+
+		res.cookie('_tk_v', session.USID, { domain: process.env.CKEBase, path: '/', secure: true });
+
+
+
+		res.send('Hello there !');
+	});
+}
+
+
 app.use(cookieParser());
 
 app.get('/', function(req, res){
-	
-	// Verifica se a sessao exite 
-	var session = req.cookies._tk_v;
-  	if (session === undefined) {
-		const USID = GetUSID();
 
-			console.log(USID);
-
-			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
-			res.send('Hello there !');
+	MakeIndex(req, res);
 
 	
-		
-		
- 	} else {
 
 
-	}
-
-
-	//res.redirect('/login')
 		
 	
 });
