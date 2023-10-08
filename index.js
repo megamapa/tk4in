@@ -92,14 +92,14 @@ httpsServer.listen(443, () => {
 
 app.get('/', function(req, res){	
 	GetSession(req, res).then(sess =>{
-		if (sess) {
+		
 
 
 			res.send('Hello there !');
 			//res.redirect('/login');
 		
 
-		}
+		
 	
 	
 		
