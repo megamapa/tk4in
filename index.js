@@ -19,7 +19,7 @@ async function RandomNum(min, max) {
 }
 
 // Gera uma Unic Session ID
-async function GetUSID() {
+function GetUSID() {
 	RandomNum(111,999).then(res1 => {
     	RandomNum(20199,99199).then(res2 => {
 			RandomNum(10,99).then(res3 => {
