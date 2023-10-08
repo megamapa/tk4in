@@ -66,11 +66,11 @@ const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(80, () => {
-	console.log('\033[36m'+dte+': \033[32mHTTP Server rodando na porta 80.\033[0;0m');
+	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTP Server rodando na porta 80.\033[0;0m');});
 });
 
 httpsServer.listen(443, () => {
-	console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');
+	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
 // Inicializa variáveis globais
