@@ -14,7 +14,7 @@ async function GetDate() {
 	return new Date(new Date().getTime() - (offset*60*1000)).toISOString().replace(/T/,' ').replace(/\..+/, '');
 }
 
-async function RandomNun(min, max) {  
+async function RandomNum(min, max) {  
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
@@ -73,8 +73,19 @@ httpsServer.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
-app.get('/', function(req, res){
-	res.cookie('_tk_v', 'TK-'+Version+'.'+RandomNun(111,999)+'.'+RandomNun(20199,99199)+'.'+RandomNun(10,99)+'.'+'.'+RandomNun(10,99)+'.'+RandomNun(10199,99999), { domain: process.env.CKEBase, path: '/', secure: true });
+app.get('/', function(req, res)
+{	RandomNum(111,999).then(res1 => {
+    	RandomNum(20199,99199).then(res2 => {
+			RandomNum(10,99).then(res3 => {
+				RandomNum(10,99).then(res4 => {
+					RandomNum(10199,99999).then(res5 => {
+						res.cookie('_tk_v', 'TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5, { domain: process.env.CKEBase, path: '/', secure: true });
+					});
+				});
+			});
+		});
+	});
+
 	res.send('Hello there !');
 	//res.redirect('/login');
 });
