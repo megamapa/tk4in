@@ -33,7 +33,7 @@ async function SetSession(res, key) {
 }
 
 async function GetSession(req, res) {
-	SetSession(res, '_tk_v').then(sess=> {return sess});
+	return await SetSession(res, '_tk_v');
 }
 /****************************************************************************************************/
 /* Le as variáveis de ambiente																		*/
