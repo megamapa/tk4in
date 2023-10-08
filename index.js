@@ -3,7 +3,8 @@
 /* Para executar use: node index.js &                                                               */
 /****************************************************************************************************/
 process.title = 'tk4in';
-const Version = 'v1.0.0';
+const Version = '2.0.0';
+var starttime;
 
 /****************************************************************************************************/
 /* Funcoes uteis   																					*/
@@ -11,6 +12,10 @@ const Version = 'v1.0.0';
 async function GetDate() {
 	let offset = new Date(new Date().getTime()).getTimezoneOffset();
 	return new Date(new Date().getTime() - (offset*60*1000)).toISOString().replace(/T/,' ').replace(/\..+/, '');
+}
+
+async function RandomNun(min, max) {  
+	return Math.floor( Math.random() * (max - min) + min)
 }
 
 /****************************************************************************************************/
@@ -26,7 +31,7 @@ const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
 
-// Publica STATUSD
+// Publica STATUS
 async function PublishUpdate() {
 	GetDate().then(dte => {
 		let uptime = Date.parse(dte) - starttime;
@@ -35,8 +40,8 @@ async function PublishUpdate() {
 }
 
 // Updates server status as soon as it successfully connects
-hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB connected.\033[0;0m');
-																		console.log('\033[36m'+dte+': \033[32mWaiting clients...\033[0;0m');}); });
+hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB conectado.\033[0;0m');
+																		console.log('\033[36m'+dte+': \033[32mAguardando clientes...\033[0;0m');}); });
 
 /****************************************************************************************************/
 /* Inicializa o express																		        */
@@ -47,24 +52,18 @@ const https = require('https');
 const express = require('express');
 const app = express();
 
-// Certificate
+// Certificado
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/tk4.in/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/tk4.in/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/tk4.in/fullchain.pem', 'utf8');
 
-const credentials = {
+// Inicia http & https
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer({
 	key: privateKey,
 	cert: certificate,
 	ca: ca
-};
-
-app.use((req, res) => {
-	res.send('Hello there !');
-});
-
-// Starting both http & https servers
-const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
+}, app);
 
 httpServer.listen(80, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTP Server rodando na porta 80.\033[0;0m');});
@@ -74,8 +73,11 @@ httpsServer.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
-// Inicializa variáveis globais
-var starttime=0;
+app.get('/', function(req, res){
+	res.cookie('_tk_v', 'TK-'+Version+'.'+RandomNun(111,999)+'.'+RandomNun(20199,99199)+'.'+RandomNun(10,99)+'.'+'.'+RandomNun(10,99)+'.'+RandomNun(10199,99999), { domain: process.env.CKEBase, path: '/', secure: true });
+	res.send('Hello there !');
+	//res.redirect('/login');
+});
 
 /****************************************************************************************************/
 /* 	Mostra parametros e aguarda clientes															*/
