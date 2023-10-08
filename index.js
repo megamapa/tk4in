@@ -11,11 +11,11 @@ const app = express();
 //const certificate = fs.readFileSync('/etc/letsencrypt/live/tk4.in/cert.pem', 'utf8');
 //const ca = fs.readFileSync('/etc/letsencrypt/live/tk4.in/chain.pem', 'utf8');
 
-const credentials = {
-	key: privateKey,
-	cert: certificate,
-	ca: ca
-};
+//const credentials = {
+//	key: privateKey,
+//	cert: certificate,
+//	ca: ca
+//};
 
 app.use((req, res) => {
 	res.send('Hello there !');
