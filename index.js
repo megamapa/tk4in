@@ -25,7 +25,6 @@ async function GetUSID() {
 			RandomNum(10,99).then(res3 => {
 				RandomNum(10,99).then(res4 => {
 					RandomNum(10199,99999).then(res5 => {
-						console.log('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);
 						return('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);	
 					});
 				});
@@ -98,6 +97,7 @@ app.get('/', function(req, res){
 	var session = req.cookies._tk_v;
   	if (session === undefined) {
 		GetUSID().then(USID=>{ 
+			console.log(USID);
 			res.cookie('_tk_v', USID, { domain: process.env.CKEBase, path: '/', secure: true });
 			res.send('Hello there !');
 		});
