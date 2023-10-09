@@ -90,14 +90,11 @@ httpsServer.listen(443, () => {
 async function GetSession(req, res) {
 	// Inicializa a sessao
 	let	session = {
-		USID : '',
 		start: await GetDate(),
 		login : '*',
 		lang : "en-US",
 		map : 'MB',
 		mapset : ['MB'],
-		useragent : "",
-		ipAddress : "",
 	};
 	// le o USID no cookie
 	let USID = req.cookies._tk_v;
