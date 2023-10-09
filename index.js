@@ -103,13 +103,13 @@ async function GetSession(req, res) {
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
 		session = await hub.hgetall('ses:'+USID);
-		hub.del('ses:'+USID);
+		await hub.del('ses:'+USID);
 		USID = await GetUSID();
 	} else {
-		session.USID = USID;
 		session.useragent = req.get('User-Agent');
 		session.ipAddress = req.socket.remoteAddress;
 	}
+	session.USID = USID;
 	await hub.hset('ses:'+USID, session);
 	// Retorna uma nova sessao
 	console.log(JSON.stringify(session, null, 2));
@@ -121,6 +121,7 @@ async function MakeIndex(req, res) {
 	const nonce = randomBytes(64).toString('base64');
 	// Cria os Headers
 	app.use(helmet({
+		xPoweredBy: false,
 		referrerPolicy: {
 				policy: "no-referrer-when-downgrade",
 		},
@@ -128,7 +129,7 @@ async function MakeIndex(req, res) {
 			directives: {
 				"default-src": ["'self'"],
 				"base-uri": ["'self'"],
-				  "font-src": ["cdnjs.cloudflare.com/ajax/libs/font-awesome/"],
+				"font-src": ["cdnjs.cloudflare.com/ajax/libs/font-awesome/"],
 				"connect-src": ["'self'","*.mapbox.com/"],
 				"script-src": ["'report-sample'", "'nonce-"+nonce+"'", "cdn.jsdelivr.net/npm/", process.env.CDNBase],
 				"style-src": ["'self'", "report-sample'", "cdn.jsdelivr.net/npm/", process.env.CDNBase],
