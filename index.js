@@ -97,6 +97,7 @@ async function GetSession(req, res) {
 		map : 'MB',
 		mapset : ['MB'],
 		useragent : "",
+		ipAddress : "",
 	};
 	// le o USID no cookie
 	let USID = req.cookies._tk_v;
@@ -105,12 +106,15 @@ async function GetSession(req, res) {
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
 		session = await hub.hgetall('ses:'+USID);
+		hub.del('ses:'+USID);
+		USID = await GetUSID();
 	} else {
 		session.USID = USID;
 		session.useragent = req.get('User-Agent');
-		await hub.hset('ses:'+USID, session);
+		session.ipAddress = req.socket.remoteAddress;
 	}
-	// Retorna a sessao
+	await hub.hset('ses:'+USID, session);
+	// Retorna uma nova sessao
 	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
