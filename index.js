@@ -52,7 +52,8 @@ async function PublishUpdate() {
 }
 
 // Atualiza o STATUS do servidor assim que o redis conectar
-hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB conectado.\033[0;0m') })});
+hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB conectado.\033[0;0m');
+																		console.log('\033[36m'+dte+': \033[32mAguardando clientes...\033[0;0m');}); });
 
 /****************************************************************************************************/
 /* Cria e abre uma conexão MySQL																	*/
@@ -124,6 +125,7 @@ async function GetSession(headers) {
 server.on('error', (err) => console.log('\033[36m'+dte+': \033[32mErro no HTTP2.\033[0;0m'));
 
 server.on('stream', (stream, headers) => {
+	console.log({ headers });
 	// Carrega a sessão
 	const session = GetSession(headers);
 	
