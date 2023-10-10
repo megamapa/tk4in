@@ -4,21 +4,23 @@
 /****************************************************************************************************/
 process.title = 'tk4in';
 const Version = '2.0.0';
+
 var starttime;
 
 /****************************************************************************************************/
-/* Funcoes uteis   																					*/
+/* Funções úteis   																					*/
 /****************************************************************************************************/
 async function GetDate() {
 	let offset = new Date(new Date().getTime()).getTimezoneOffset();
 	return new Date(new Date().getTime() - (offset*60*1000)).toISOString().replace(/T/,' ').replace(/\..+/, '');
 }
 
+const {	randomBytes } = require('node:crypto');
 async function RandomNum(min, max) {  
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
-// Gera uma Unic Session ID
+// Gera uma USID - Unique Session ID
 async function GetUSID() {
 	res1 = await RandomNum(111,999);
     res2 = await RandomNum(20199,99199);
@@ -35,7 +37,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 /****************************************************************************************************/
-/* Create and open Redis connection 																*/
+/* Cria e abre as conexões com o Redis 																*/
 /****************************************************************************************************/
 const Redis = require('ioredis');
 const hub = new Redis({host:process.env.RD_host, port:process.env.RD_port, password:process.env.RD_pass});
@@ -49,44 +51,45 @@ async function PublishUpdate() {
 	});
 }
 
-// Updates server status as soon as it successfully connects
-hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB conectado.\033[0;0m');
-																		console.log('\033[36m'+dte+': \033[32mAguardando clientes...\033[0;0m');}); });
+// Atualiza o STATUS do servidor assim que o redis conectar
+hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\033[36m'+dte+': \033[32mHUB conectado.\033[0;0m') })});
 
 /****************************************************************************************************/
-/* Inicializa o express																		        */
+/* Cria e abre uma conexão MySQL																	*/
 /****************************************************************************************************/
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const helmet = require("helmet");
-const app = express();
-const {	randomBytes } = require('node:crypto');
+const mysql = require('mysql');
+const db = mysql.createPool({host:process.env.DB_host, database:process.env.DB_name, user:process.env.DB_user, password:process.env.DB_pass, connectionLimit:10});
 
-// Certificado
+// Atualiza estatísticas a cada 60s
+setInterval(function() {
+			// Publica estatus do serviço
+			PublishUpdate();
+},60000);
+
+/****************************************************************************************************/
+/* Inicializa o http2																		        */
+/****************************************************************************************************/
+const fs = require('node:fs');
+// Le o certificado
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/tk4.in/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/tk4.in/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/tk4.in/fullchain.pem', 'utf8');
-
-// Inicia http & https
-const httpServer = http.createServer(app);
-const httpsServer = https.createServer({
-	key: privateKey,
-	cert: certificate,
-	ca: ca
-}, app);
-
-httpServer.listen(80, () => {
-	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTP Server rodando na porta 80.\033[0;0m');});
+// Cria o servidor
+const http2 = require('node:http2');
+const server = http2.createSecureServer({
+  key: privateKey,
+  cert: certificate,
+  ca: ca
 });
 
-httpsServer.listen(443, () => {
+server.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
-async function GetSession(req, res) {
+/****************************************************************************************************/
+/* Rotinas do http2																			        */
+/****************************************************************************************************/
+async function GetSession(headers) {
 	// Inicializa a sessao
 	let	session = {
 		start: await GetDate(),
@@ -94,9 +97,10 @@ async function GetSession(req, res) {
 		lang : "en-US",
 		map : 'MB',
 		mapset : ['MB'],
+		IPv6 : "",
 	};
 	// le o USID no cookie
-	let USID = req.cookies._tk_v;
+	//let USID = req.cookies._tk_v;
 	// Se nao tiver um cookie cria um novo
 	if (USID === undefined) { USID = await GetUSID(); }
 	// Verifica se tem uma sessao no redis
@@ -105,85 +109,50 @@ async function GetSession(req, res) {
 		await hub.del('ses:'+USID);
 		USID = await GetUSID();
 	} else {
-		session.useragent = req.get('User-Agent');
+		session.useragent = headers['user-agent'];
 		session.ipAddress = req.socket.remoteAddress;
 	}
 	session.USID = USID;
 	await hub.hset('ses:'+USID, session);
-	// Retorna uma nova sessao
-	console.log(JSON.stringify(session, null, 2));
+	// Retorna uma nova sessão
+							console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
+/****************************************************************************************************/
+/* Mensagens do http2																		        */
+/****************************************************************************************************/
+server.on('error', (err) => console.log('\033[36m'+dte+': \033[32mErro no HTTP2.\033[0;0m'));
 
-async function MakeIndex(req, res) {
-	// Gera noonce
-	const nonce = randomBytes(64).toString('base64');
-	// Cria os Headers
-	app.use(helmet({
-		xPoweredBy: false,
-		referrerPolicy: {
-				policy: "no-referrer-when-downgrade",
-		},
-		contentSecurityPolicy:{
-			directives: {
-				"default-src": ["'self'"],
-				"base-uri": ["'self'"],
-				"font-src": ["cdnjs.cloudflare.com/ajax/libs/font-awesome/"],
-				"connect-src": ["'self'","*.mapbox.com/"],
-				"script-src": ["'report-sample'", "'nonce-"+nonce+"'", "cdn.jsdelivr.net/npm/", process.env.CDNBase],
-				"style-src": ["'self'", "report-sample'", "cdn.jsdelivr.net/npm/", process.env.CDNBase],
-				"object-src": ["'none'"],
-				"frame-src": ["'self'"],
-				"frame-ancestors": ["'none'"],
-				"img-src": ["'self'", process.env.CDNBase],
-				"form-action": ["'self'"],
-				"media-src": ["'self'"],
-				"worker-src": ["'self'"]
-			}
-		},
-		
-	  })
-	);
-	// Pega sessao
-	GetSession(req).then(session => {
-		// Envia cookie da sessao
-		res.cookie('_tk_v', session.USID, { domain: process.env.CKEBase, path: '/', secure: true });
-		let buffer ="<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link rel=stylesheet href='"+process.env.CDNBase+"css/style.css' integrity='sha384-cVCCdKiMMG+okvKtpSjnqFgt5hMESsz8YyVX4vP/EsduAqJmU2M/ZEtcAXP91uUm' crossorigin=anonymous></head><body>";
-		buffer+="teste";
-		
-
-		  
-
-
-		buffer+="</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>";
-		res.send(buffer);
-	});
-}
-
-
-app.use(cookieParser());
-
-app.get('/', function(req, res){
-
-
-	MakeIndex(req, res);
-
+server.on('stream', (stream, headers) => {
+	// Carrega a sessão
+	const session = GetSession(headers);
 	
+	const method = headers[':method'];
+	const path = headers[':path'];
 
+	stream.respond({
+		':status': '200',
+		'content-type': 'text-plain',
+		'cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBASE+'; Path=/; Secure; HttpOnly',
+		[http2.sensitiveHeaders]: ['cookie'],
+	}); 
 
+	stream.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link rel=stylesheet href='"+process.env.CDNBase+"css/style.css' integrity='sha384-cVCCdKiMMG+okvKtpSjnqFgt5hMESsz8YyVX4vP/EsduAqJmU2M/ZEtcAXP91uUm' crossorigin=anonymous></head><body>");
 		
-	
+	stream.write("teste");
+		
+	stream.end("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>");
 });
 
 /****************************************************************************************************/
-/* 	Mostra parametros e aguarda clientes															*/
+/* 	Mostra parâmetros e aguarda clientes															*/
 /****************************************************************************************************/
-const OS = require('os');
+const os = require('node:os');
 GetDate().then(dte => {
-	// Salva hora de inicio
+	// Salva hora de início
 	starttime = Date.parse(dte);
-	// Mostra parametros e aguarda clientes
+	// Mostra parâmetros
 	console.log('\033[36m'+dte+': \033[37m================================');
 	console.log('\033[36m'+dte+': \033[37mAPP : ' + process.title + ' ('+Version+')');
-	console.log('\033[36m'+dte+': \033[37mCPUs: '+ OS.cpus().length);
+	console.log('\033[36m'+dte+': \033[37mCPUs: '+ os.cpus().length);
 	console.log('\033[36m'+dte+': \033[37m================================');});
