@@ -96,14 +96,14 @@ async function GetSession(headers) {
 		startTime: await GetDate(),
 		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
-		lang : 'en-US',
 		map : 'MB',
 		mapset : ['MB'],
+		lang : 'en-US',
 	};
 	// Le os cookies
 	let str = headers['cookie'];
 	
-	const lang = headers['accept-language'];
+	//const lang = headers['accept-language'];
 	
 	
 	// le o USID no cookie
@@ -140,7 +140,7 @@ server.on('stream', (stream, headers) => {
 	switch(path) {
     	case '/': {
 			nonce = randomBytes(16).toString('hex');
-			console.log("default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-"+nonce+"' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'");
+			console.log(session);
 			// Envia o Header
 			stream.respond({
 				':status': '200',
