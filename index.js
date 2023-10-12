@@ -109,7 +109,7 @@ async function GetSession(headers) {
 	// le o USID no cookie
 
 	// Se nao tiver um cookie cria um novo
-	if (session.cookies._tk_v === undefined) { let USID = await GetUSID(); } else {let USID = session.cookies._tk_v}
+	if (typeof session.cookies._tk_v === undefined) { let USID = await GetUSID(); } else {let USID = session.cookies._tk_v}
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
 		session = await hub.hgetall('ses:'+USID);
