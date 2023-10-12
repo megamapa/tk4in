@@ -140,7 +140,8 @@ server.on('stream', (stream, headers) => {
 	const path = headers[':path'];
 	switch(path) {
     	case '/': {
-			nonce = randomBytes(16);
+			nonce = randomBytes(16).toString('hex');
+			// Envia o Header
 			stream.respond({
 				':status': '200',
 				'access-control-allow-origin': "'"+process.env.WWWBase+"'",
