@@ -132,7 +132,7 @@ server.on('error', (err) => console.log('\033[36m'+dte+': \033[32mErro no HTTP2.
 
 server.on('stream', (stream, headers) => {
 	// Carrega a sessão
-	const session = GetSession(headers);
+	const session = await GetSession(headers);
 	
 	const method = headers[':method'];
 
