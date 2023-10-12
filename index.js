@@ -140,15 +140,16 @@ server.on('stream', (stream, headers) => {
 	const path = headers[':path'];
 	switch(path) {
     	case '/': {
+			nonce = randomBytes(16);
 			stream.respond({
 				':status': '200',
-				'access-control-allow-origin': "'"+process.env.WWWBASE+"'",
+				'access-control-allow-origin': "'"+process.env.WWWBase+"'",
 				'content-type': 'text/html; charset=UTF-8',
 				'cache-control': 'no-cache',
-				'content-security-policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'",
-				'permissions-policy': "geolocation=(self '"+process.env.CDNBASE+"')",
+				'content-security-policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-"+nonce+"' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'",
+				'permissions-policy': "geolocation=(self '"+process.env.CDNBase+"')",
 				'referrer-policy': "no-referrer-when-downgrade",
-				'set-cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBASE+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['cookie'],
+				'set-cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['cookie'],
 				'set-cookie': 'cross-site-cookie=name; SameSite=None; Secure; HttpOnly',
 				'strict-transport-security':'max-age=31536000; includeSubDomains; preload',
 				'vary': 'Accept-Encoding',
