@@ -164,14 +164,25 @@ server.on('stream', (stream, headers) => {
 			stream.end("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>");
 			break;
 		}
+		
 		case '/main': {
 
 			break;
 		}
+
 		case '/login': {
 
 			break;
 		}
+
+    	case '/favicon.ico': {
+			stream.respond({
+				':status': '200',
+				'content-type': 'image/x-icon',
+			});
+			res.end();
+		}
+
 		default: {
 			stream.respond({
 				':status': '301',
