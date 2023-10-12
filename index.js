@@ -1,8 +1,8 @@
 /****************************************************************************************************/
-/* tk4in                                                                                            */
-/* Para executar use: node index.js &                                                               */
+/* http2                                                                                            */
+/* Para executar use: node http2.js &                                                               */
 /****************************************************************************************************/
-process.title = 'tk4in';
+process.title = 'http2';
 const Version = '2.0.0';
 
 var starttime;
@@ -93,15 +93,22 @@ server.listen(443, () => {
 async function GetSession(headers) {
 	// Inicializa a sessao
 	let	session = {
-		start: await GetDate(),
+		startTime: await GetDate(),
+		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
 		lang : "en-US",
 		map : 'MB',
 		mapset : ['MB'],
-		IPv6 : "",
 	};
+	// Le os cookies
+	let str = headers['cookie'];
+	
+	const lang = headers['accept-language'];
+	
+	
+	
 	// le o USID no cookie
-	//let USID = req.cookies._tk_v;
+	let USID = session.cookies._tk_v;
 	// Se nao tiver um cookie cria um novo
 	if (USID === undefined) { USID = await GetUSID(); }
 	// Verifica se tem uma sessao no redis
@@ -111,7 +118,7 @@ async function GetSession(headers) {
 		USID = await GetUSID();
 	} else {
 		session.useragent = headers['user-agent'];
-		session.ipAddress = req.socket.remoteAddress;
+		//session.ipAddress = req.socket.remoteAddress;
 	}
 	session.USID = USID;
 	await hub.hset('ses:'+USID, session);
@@ -130,20 +137,50 @@ server.on('stream', (stream, headers) => {
 	const session = GetSession(headers);
 	
 	const method = headers[':method'];
+
 	const path = headers[':path'];
+	switch(path) {
+    	case '/': {
+			stream.respond({
+				':status': '200',
+				'access-control-allow-origin': "'"+process.env.WWWBASE+"'",
+				'content-type': 'text/html; charset=UTF-8',
+				'cache-control': 'no-cache',
+				'content-security-policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-' cdn.jsdelivr.net/npm/ "+process.env.CDNBASE+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBASE+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBASE+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'",
+				'permissions-policy': "geolocation=(self '"+process.env.CDNBASE+"')",
+				'referrer-policy': "no-referrer-when-downgrade",
+				'set-cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBASE+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['cookie'],
+				'set-cookie': 'cross-site-cookie=name; SameSite=None; Secure; HttpOnly',
+				'strict-transport-security':'max-age=31536000; includeSubDomains; preload',
+				'vary': 'Accept-Encoding',
+				'x-content-type-options': 'nosniff',
+				'x-frame-options': 'DENY',
+				'x-permitted-cross-domain-policies': 'none',
+				'x-xss-protection': '1; mode=block',
+			}); 
+			stream.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link rel=stylesheet href='"+process.env.CDNBase+"css/style.css' integrity='sha384-cVCCdKiMMG+okvKtpSjnqFgt5hMESsz8YyVX4vP/EsduAqJmU2M/ZEtcAXP91uUm' crossorigin=anonymous></head><body>");
+			stream.write("teste");
+			stream.end("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>");
+			break;
+		}
+		case '/main': {
 
-	stream.respond({
-		':status': '200',
-		'content-type': 'text-plain',
-		'cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBASE+'; Path=/; Secure; HttpOnly',
-		[http2.sensitiveHeaders]: ['cookie'],
-	}); 
+			break;
+		}
+		case '/login': {
 
-	stream.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link rel=stylesheet href='"+process.env.CDNBase+"css/style.css' integrity='sha384-cVCCdKiMMG+okvKtpSjnqFgt5hMESsz8YyVX4vP/EsduAqJmU2M/ZEtcAXP91uUm' crossorigin=anonymous></head><body>");
-		
-	stream.write("teste");
-		
-	stream.end("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>");
+			break;
+		}
+		default: {
+			stream.respond({
+				':status': '301',
+				'location': '/' 
+			});
+			stream.end();
+		}
+	}
+
+
 });
 
 /****************************************************************************************************/
