@@ -96,7 +96,7 @@ async function GetSession(headers) {
 		startTime: await GetDate(),
 		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
-		lang : "en-US",
+		lang : 'en-US',
 		map : 'MB',
 		mapset : ['MB'],
 	};
@@ -135,7 +135,7 @@ server.on('stream', (stream, headers) => {
 	const session = GetSession(headers);
 	
 	const method = headers[':method'];
-
+/*
 	const path = headers[':path'];
 	switch(path) {
     	case '/': {
@@ -192,7 +192,7 @@ server.on('stream', (stream, headers) => {
 		}
 	}
 
-
+*/
 });
 
 /****************************************************************************************************/
