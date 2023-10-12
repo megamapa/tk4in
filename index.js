@@ -131,7 +131,6 @@ async function GetSession(headers) {
 server.on('error', (err) => console.log('\033[36m'+dte+': \033[32mErro no HTTP2.\033[0;0m'));
 
 server.on('stream', (stream, headers) => {
-	console.log("default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-"+nonce+"' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'");
 	// Carrega a sessão
 	const session = GetSession(headers);
 	
@@ -141,6 +140,7 @@ server.on('stream', (stream, headers) => {
 	switch(path) {
     	case '/': {
 			nonce = randomBytes(16).toString('hex');
+			console.log("default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-"+nonce+"' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'");
 			// Envia o Header
 			stream.respond({
 				':status': '200',
