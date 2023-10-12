@@ -164,7 +164,7 @@ server.on('stream', (stream, headers) => {
 			stream.end("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script></body></html>");
 			break;
 		}
-		
+
 		case '/main': {
 
 			break;
@@ -185,8 +185,8 @@ server.on('stream', (stream, headers) => {
 
 		default: {
 			stream.respond({
-				':status': '301',
-				'location': '/' 
+				':status': '404',
+				'content-type': 'text/html; charset=UTF-8',
 			});
 			stream.end();
 		}
