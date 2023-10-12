@@ -145,7 +145,7 @@ server.on('stream', (stream, headers) => {
 				'access-control-allow-origin': "'"+process.env.WWWBASE+"'",
 				'content-type': 'text/html; charset=UTF-8',
 				'cache-control': 'no-cache',
-				'content-security-policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-' cdn.jsdelivr.net/npm/ "+process.env.CDNBASE+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBASE+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBASE+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'",
+				'content-security-policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; style-src 'self' 'report-sample' cdn.jsdelivr.net/npm/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; img-src 'self' "+process.env.CDNBase+"; font-src cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' *.mapbox.com/; form-action 'self'; media-src 'self'; worker-src 'self'",
 				'permissions-policy': "geolocation=(self '"+process.env.CDNBASE+"')",
 				'referrer-policy': "no-referrer-when-downgrade",
 				'set-cookie': '_tk_v='+session.USID+'; Domain='+process.env.CKEBASE+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['cookie'],
