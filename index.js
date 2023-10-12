@@ -135,7 +135,7 @@ server.on('stream', (stream, headers) => {
 	const session = GetSession(headers);
 	
 	const method = headers[':method'];
-/*
+
 	const path = headers[':path'];
 	switch(path) {
     	case '/': {
@@ -192,7 +192,6 @@ server.on('stream', (stream, headers) => {
 		}
 	}
 
-*/
 });
 
 /****************************************************************************************************/
