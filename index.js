@@ -99,6 +99,7 @@ async function GetSession(headers) {
 		map : 'MB',
 		mapset : ['MB'],
 		lang : 'en-US',
+		cookies :{},
 	};
 	// Le os cookies
 	let str = headers['cookie'];
