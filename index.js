@@ -130,6 +130,11 @@ async function GetSession(headers) {
 server.on('error', (err) => console.log('\033[36m'+dte+': \033[32mErro no HTTP2.\033[0;0m'));
 
 server.on('stream', (stream, headers) => {
+
+
+	console.log(headers);
+
+
 	// Carrega a sessão
 	GetSession(headers).then(session => {
 	
@@ -139,7 +144,7 @@ server.on('stream', (stream, headers) => {
 		switch(path) {
     		case '/': {
 				nonce = randomBytes(16).toString('hex');
-				console.log(session);
+				//console.log(session);
 				// Envia o Header
 				stream.respond({ //http2stream.respond https://http.dev/2/test
 					':status': '200',
