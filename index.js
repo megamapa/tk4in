@@ -80,7 +80,8 @@ const http2 = require('node:http2');
 const server = http2.createSecureServer({
   key: privateKey,
   cert: certificate,
-  ca: ca
+  ca: ca,
+  allowHTTP1 : true
 });
 
 server.listen(443, () => {
@@ -160,8 +161,11 @@ server.on('stream', (stream, headers) => {
 					'x-permitted-cross-domain-policies': 'none',
 					'x-xss-protection': '1; mode=block',
 				},{ endStream : false}); 
+				// Header	
 				stream.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link href='"+process.env.CDNBase+"css/style.css' rel=stylesheet crossorigin=anonymous></head><body>");
-				stream.write("teste");
+				// Block
+				stream.write("<div class=loader-wrap id=loader-wrap><div class=blocks><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div></div></div>");
+				// Scripts
 				stream.write("</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script nonce="+nonce+">const es=document.getElementsByName('flip');Array.from(es).forEach(function (e){e.addEventListener('click', function(){document.getElementById('login-box').classList.toggle('flipped');});});document.getElementById('log').addEventListener('click', function(){document.getElementById('content').classList.add('blured');document.getElementById('loader-wrap').style.display='block';});");
 				
 				stream.end("</script></body></html>");
