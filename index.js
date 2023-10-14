@@ -89,7 +89,7 @@ server.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0m');});
 });
 
-server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[1;31mErro no HTTP2..\033[0m');}));
+server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[0;31mErro no HTTP2.\033[0m');}));
 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
@@ -134,8 +134,8 @@ function onRequest(req, res) {
 	// Verifica se a conexão e HTTP/1 ou HTTP/2
 	const { socket: { alpnProtocol } } = req.httpVersion === '2.0' ? req.stream.session : req;
 	// Responde
-	console.log(req);
-	const path = "/";
+	console.log(req.rawHeaders);
+	const path = '/';
 	switch(path) {
 			case '/': {
 				nonce = randomBytes(16).toString('hex');
