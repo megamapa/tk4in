@@ -138,6 +138,7 @@ function onRequest(req, res) {
 	const path = "/";
 	switch(path) {
 			case '/': {
+				nonce = randomBytes(16).toString('hex');
 				res.writeHead(200, { 
 					'access-control-allow-methods': 'GET,POST',
 					'access-control-allow-origin': "'"+process.env.WWWBase+"'",
