@@ -134,8 +134,7 @@ function onRequest(req, res) {
 	// Verifica se a conexão e HTTP/1 ou HTTP/2
 	const { socket: { alpnProtocol } } = req.httpVersion === '2.0' ? req.stream.session : req;
 	// Responde
-	const path = '/'; //req.headers[':path'];
-	if (path !== undefined) {
+	const path = req.httpVersion === '2.0' ? req.headers[':path'] : req.url;
 	switch(path) {
 			case '/': {
 				nonce = randomBytes(16).toString('hex');
@@ -179,9 +178,7 @@ function onRequest(req, res) {
 
 				break;
 			}
-	}	
-	}	
-
+	}
 }
 
 
