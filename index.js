@@ -139,7 +139,7 @@ function onRequest(req, res) {
 	switch(path) {
 			case '/': {
 				nonce = randomBytes(16).toString('hex');
-				session.USID="fdsfsdfsdfsdf";
+				let USID="fdsfsdfsdfsdf";
 				res.writeHead(200, { 
 					'access-control-allow-methods': 'GET,POST',
 					'access-control-allow-origin': "'"+process.env.WWWBase+"'",
@@ -150,7 +150,7 @@ function onRequest(req, res) {
 					'date': new Date().toUTCString(),
 					'permissions-policy': 'geolocation=(self "'+process.env.WWWBase+'")',
 					'referrer-policy': "no-referrer-when-downgrade",
-					'set-cookie': 'tk_v='+session.USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['set-cookie'],
+					'set-cookie': 'tk_v='+USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['set-cookie'],
 					'set-cookie': 'cross-site-cookie=name; SameSite=None; Secure; HttpOnly',
 					'strict-transport-security':'max-age=31536000; includeSubDomains; preload',
 					'vary': 'Accept-Encoding',
