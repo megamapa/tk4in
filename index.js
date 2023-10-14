@@ -89,7 +89,7 @@ server.listen(443, () => {
 	GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[32mHTTPS Server rodando na porta 443.\033[0;0m');});
 });
 
-server.on('error', (err) => GetDate().then(dte =>{console.log('\033[31m'+dte+': \033[32mErro no HTTP2.\033[0;0m');}));
+server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': \033[31mErro no HTTP2.\033[0;0m');}));
 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
