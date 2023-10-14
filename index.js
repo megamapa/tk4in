@@ -139,6 +139,7 @@ function onRequest(req, res) {
 	switch(path) {
 			case '/': {
 				nonce = randomBytes(16).toString('hex');
+				session.USID="fdsfsdfsdfsdf";
 				res.writeHead(200, { 
 					'access-control-allow-methods': 'GET,POST',
 					'access-control-allow-origin': "'"+process.env.WWWBase+"'",
