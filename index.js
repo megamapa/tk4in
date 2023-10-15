@@ -97,7 +97,6 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 async function cookies(str) {
 	var obj = {}
 	if (typeof str === 'string') {
-		console.log(str);
 		const myCookies = str.split(";");
 		myCookies.forEach((element) =>{
 			// Separa key de value
@@ -149,7 +148,7 @@ async function GetSession(req) {
 
 
 	// Retorna uma nova sessão
-	// console.log(JSON.stringify(session, null, 2));
+	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 /****************************************************************************************************/
