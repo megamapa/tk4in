@@ -94,7 +94,7 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
-async function GetSession(headers) {
+async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
 		startTime: await GetDate(),
@@ -105,8 +105,10 @@ async function GetSession(headers) {
 		mapset : ['MB'],
 		lang : 'en-US',
 	};
+	// Pega o caminho
+	session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	// Le os cookies
-	let str = headers['cookie'];
+	let str = req['cookie'];
 
 	//const lang = headers['accept-language'];
 
@@ -118,11 +120,11 @@ async function GetSession(headers) {
 		await hub.del('ses:'+USID);
 		USID = await GetUSID();
 	} else {
-		session.useragent = headers['user-agent'];
+		session.useragent = req['user-agent'];
 		//session.ipAddress = req.socket.remoteAddress;
 	}
 	session.USID = USID;
-	await hub.hset('ses:'+USID, session);
+	hub.hset('ses:'+USID, session);
 	// Retorna uma nova sessão
 	// console.log(JSON.stringify(session, null, 2));
 	return(session);
@@ -131,20 +133,15 @@ async function GetSession(headers) {
 /* Mensagens do http2																				*/
 /****************************************************************************************************/
 function onRequest(req, res) {
-	// Verifica se a conexão e HTTP/1 ou HTTP/2
-	if (req.httpVersion === '2.0') {
-		const { socket: { alpnProtocol } } =  req.stream.session;
-		path = req.headers[':path'];
-	} else {
-		const { socket: { alpnProtocol } } =  req;
-		path = req.url;
-	}
-	// Responde
-	switch(path) {
+	// Verifica se a conexão e HTTP/1 ou HTTP/2 e unifica o socket
+	const { socket: { alpnProtocol } } = req.httpVersion === '2.0'?req.stream.session:req;
+	// Carrega a sessão
+	console.log(req);
+	GetSession(req).then(session => {
+		// Responde
+		switch(session.path) {
 			case '/': {
 				nonce = randomBytes(16).toString('hex');
-				let USID="fdsfsdfsdfsdf";
-				let lang="pt-BR";
 				res.writeHead(200, { 
 					'access-control-allow-methods': 'GET,POST',
 					'access-control-allow-origin': "'"+process.env.WWWBase+"'",
@@ -155,7 +152,7 @@ function onRequest(req, res) {
 					'date': new Date().toUTCString(),
 					'permissions-policy': 'geolocation=(self "'+process.env.WWWBase+'")',
 					'referrer-policy': "no-referrer-when-downgrade",
-					'set-cookie': 'tk_v='+USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['set-cookie'],
+					'set-cookie': 'tk_v='+session.USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly', [http2.sensitiveHeaders]: ['set-cookie'],
 					'set-cookie': 'cross-site-cookie=name; SameSite=None; Secure; HttpOnly',
 					'strict-transport-security':'max-age=31536000; includeSubDomains; preload',
 					'vary': 'Accept-Encoding',
@@ -164,19 +161,18 @@ function onRequest(req, res) {
 					'x-permitted-cross-domain-policies': 'none',
 					'x-xss-protection': '1; mode=block' });
 				// Header
-				res.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link href='"+process.env.CDNBase+"css/style.css' rel=stylesheet crossorigin=anonymous></head><body>");
+				res.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+process.env.IndexTit+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+process.env.IndexDes+"' itemprop=description><meta name=keywords content='"+process.env.IndexKey+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link href='"+process.env.CDNBase+"css/style.css' rel=stylesheet crossorigin=anonymous></head><body>");
 				// Block
 				res.write("<div class=loader-wrap id=loader-wrap><div class=blocks><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div></div></div>");
+				// Body
 				// Scripts
 				res.write("teste</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script nonce="+nonce+">const es=document.getElementsByName('flip');Array.from(es).forEach(function (e){e.addEventListener('click', function(){document.getElementById('login-box').classList.toggle('flipped');});});document.getElementById('log').addEventListener('click', function(){document.getElementById('content').classList.add('blured');document.getElementById('loader-wrap').style.display='block';});");
-
-				res.end("</script></body></html>");
+					res.end("</script></body></html>");
 				break;
 			}
-			
+		
 			case '/main': {
-
-				break;
+					break;
 			}
 
 			case '/login': {
@@ -198,13 +194,9 @@ function onRequest(req, res) {
 				});
 				res.end(path+' - Not found');
 			}
-	}
+		}
+	});
 }
-
-
-	// Carrega a sessão
-	//GetSession(headers).then(session => {
-
 /****************************************************************************************************/
 /* Mostra parâmetros e aguarda clientes																*/
 /****************************************************************************************************/
