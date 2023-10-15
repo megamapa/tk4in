@@ -98,12 +98,13 @@ async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
-		remoteAddress: {IPv4: 'asdasd', IPv6: 'gdfgdfg'},
+		remoteAddress: {},
 		login : '*',
 		map : 'MB',
 		mapset : ['MB'],
 		lang : 'en-US',
 	};
+
 	// Le os cookies
 	if (typeof req.headers['cookie'] === 'string') {
 		const myCookies = req.headers['cookie'].split(";");
@@ -119,12 +120,11 @@ async function GetSession(req) {
 			}
 		});
 	}
-	console.log(session.cookies['tk_v']);
 
 	//const lang = headers['accept-language'];
 
 	// Se nao tiver um cookie de sessao cria um novo
-	if (session.cookies.tk_v === undefined) { USID = await GetUSID(); } else {USID = session.cookies.tk_v}
+	if (session.cookies['tk_v'] === undefined) { USID = await GetUSID(); } else {USID = session.cookies['tk_v']}
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
 		session = await hub.hgetall('ses:'+USID);
