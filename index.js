@@ -181,7 +181,7 @@ function onRequest(req, res) {
 	// Verifica se a conexão e HTTP/1 ou HTTP/2 e unifica o socket
 	const { socket: { alpnProtocol } } = req.httpVersion === '2.0'?req.stream.session:req;
 	// Carrega a sessão
-	//console.log(req);
+	console.log(req.headers);
 	GetSession(req).then(session => {
 		// Responde
 		switch(session.path) {
