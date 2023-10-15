@@ -140,9 +140,9 @@ async function GetSession(req) {
 	} else {
 		// Pega o useragent
 		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
-		//session.ipAddress = req.socket.remoteAddress;
-	}
 
+	}
+	session.ipAddress = req.socket.remoteAddress;
 	// Pega os parâmetos se houver
 	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	let path = url.split("?");
@@ -185,7 +185,6 @@ function onRequest(req, res) {
 	// Verifica se a conexão e HTTP/1 ou HTTP/2 e unifica o socket
 	const { socket: { alpnProtocol } } = req.httpVersion === '2.0'?req.stream.session:req;
 	// Carrega a sessão
-	
 	GetSession(req).then(session => {
 		// Responde
 		switch(session.path) {
