@@ -94,28 +94,10 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
-async function cookies(str) {
-	var obj = {}
-	if (typeof str === 'string') {
-		const myCookies = str.split(";");
-		myCookies.forEach((element) =>{
-			// Separa key de value
-			const myCookie = element.split("=");
-			if (myCookie[0] !== undefined || myCookie[1] !== undefined ) {
-				// Verifica se ja existe
-				const key = myCookie[0].trim();
-				if (undefined === obj[key]) {
-					obj[key]=myCookie[1];
-				}
-			}
-		});
-	}
-	return obj;
-}
-
 async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
+		cookies : {},
 		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
 		map : 'MB',
@@ -123,11 +105,24 @@ async function GetSession(req) {
 		lang : 'en-US',
 	};
 	// Le os cookies
-	session.cookies = await cookies(req.headers['cookie']);
+	if (typeof req.headers['cookie'] === 'string') {
+		const myCookies = req.headers['cookie'].split(";");
+		myCookies.forEach((element) =>{
+			// Separa key de value
+			const myCookie = element.split("=");
+			if (myCookie[0] !== undefined || myCookie[1] !== undefined ) {
+				// Verifica se ja existe
+				const key = myCookie[0].trim();
+				if (undefined === session.cookies[key]) {
+					session.cookies[key]=myCookie[1];
+				}
+			}
+		});
+	}
 
 	//const lang = headers['accept-language'];
 
-	// Se nao tiver um cookie cria um novo
+	// Se nao tiver um cookie de sessao cria um novo
 	if (session.cookies.tk_v === undefined) { USID = await GetUSID(); } else {USID = session.cookies.tk_v}
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
