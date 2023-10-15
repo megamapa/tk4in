@@ -128,7 +128,7 @@ async function GetSession(req) {
 	}
 
 	// Se nao tiver um cookie de sessao cria um novo
-	if (session.cookies['tk_v'] === undefined) { USID = await GetUSID(); } else {USID = session.cookies['tk_v']}
+	if (undefined === session.cookies['tk_v']) { USID = await GetUSID(); } else {USID = session.cookies['tk_v']}
 	// Verifica se tem uma sessao no HUB
 	if (await hub.exists('ses:'+USID)) {
 		// Le os dados da sessao no HUB
@@ -142,7 +142,7 @@ async function GetSession(req) {
 		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
 
 	}
-	session.ipAddress = req.socket.remoteAddress;
+	
 	// Pega os parâmetos se houver
 	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	let path = url.split("?");
@@ -167,6 +167,14 @@ async function GetSession(req) {
 	// Verifica se a linguagem e uma da válidas se nao for seta com inglês
 	langs =['pt-BR','en-US','zh-CN'];
 	if ( !langs.includes(session.lang) ) {session.lang='en-US'}
+
+	// Pega o IP
+	if (undefined !== req.socket.remoteAddress) {
+		let str = req.socket.remoteAddress;
+		let pos = str.lastIndexOf(':');
+		session.remoteAddress['IPv4']=str.substring(pos+1);
+		session.remoteAddress['IPv6']=str.substring(0,pos+1);
+	}
 
 	// Guarda novo ID
 	session.USID = USID;
