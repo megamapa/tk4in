@@ -95,6 +95,11 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
 async function GetSession(req) {
+
+	console.log(req);
+
+
+
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
@@ -120,31 +125,40 @@ async function GetSession(req) {
 			}
 		});
 	}
-
-	//const lang = headers['accept-language'];
-
 	// Se nao tiver um cookie de sessao cria um novo
 	if (session.cookies['tk_v'] === undefined) { USID = await GetUSID(); } else {USID = session.cookies['tk_v']}
-	// Verifica se tem uma sessao no redis
+	// Verifica se tem uma sessao no HUB
 	if (await hub.exists('ses:'+USID)) {
+		// Le os dados da sessao no HUB
 		session = await hub.hgetall('ses:'+USID);
+		// Deleta a sessao no HUB
 		hub.del('ses:'+USID);
+		// Cria um novo ID
 		USID = await GetUSID();
 
+
+
+
+
 	} else {
-		session.startTime = await GetDate();
 		// Pega o useragent
 		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
-		// Pega o caminho
-		session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 		//session.ipAddress = req.socket.remoteAddress;
 	}
+
+	// Seta a linguagem
+
+
+	// Guarda novo ID
 	session.USID = USID;
+	// Guarda ultimo acesso
+	session.startTime = await GetDate();
+	// Pega o caminho
+	session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
+	// Grava a nova sessao no HUB
 	hub.hset('ses:'+USID, session);
-
-
 	// Retorna uma nova sessão
-	console.log(JSON.stringify(session, null, 2));
+	//console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 /****************************************************************************************************/
