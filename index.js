@@ -128,15 +128,6 @@ async function GetSession(req) {
 		lang : 'en-US',
 	};
 
-	// Pega o caminho e parâmetos se houver
-	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
-	let path = url.split("?");
-	if (typeof path[1] === 'string') {
-		const myGets = path[1].split("&");
-		session.get = await Parse(myGets);
-	}
-	session.path=path[0];
-
 	// Pega os cookies
 	if (typeof req.headers['cookie'] === 'string') {
 		const myCookies = req.headers['cookie'].split(";");
@@ -153,16 +144,20 @@ async function GetSession(req) {
 		hub.del('ses:'+USID);
 		// Cria um novo ID
 		USID = await GetUSID();
-
-
-
-
-
 	} else {
 		// Pega o useragent
 		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
 		//session.ipAddress = req.socket.remoteAddress;
 	}
+
+	// Pega o caminho e parâmetos se houver
+	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
+	let path = url.split("?");
+	if (typeof path[1] === 'string') {
+		const myGets = path[1].split("&");
+		session.get = await Parse(myGets);
+	}
+	session.path=path[0];
 
 	// Seta a linguagem
 
