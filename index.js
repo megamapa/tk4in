@@ -219,7 +219,7 @@ function onRequest(req, res) {
 				res.writeHead(200, {
 					'content-type': 'image/x-icon',
 				});
-				stream.end();
+				res.end();
 				break;
 			}
 
