@@ -114,12 +114,12 @@ async function GetSession(req) {
 				// Verifica se ja existe
 				const key = myCookie[0].trim();
 				if (undefined === session.cookies[key]) {
-					console.log(key+myCookie[1]);
 					session.cookies[key]=myCookie[1];
 				}
 			}
 		});
 	}
+	console.log(session.cookies['tk_v']);
 
 	//const lang = headers['accept-language'];
 
