@@ -95,43 +95,21 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
 async function cookies(str) {
-  
 	var obj = {}
-
 	if (typeof str === 'string') {
-		var index = 0
-		while (index < str.length) {
-			var eqIdx = str.indexOf('=', index)
-  
-			// Nao tiver mais sai
-			if (eqIdx === -1) { break}
-		
-			var endIdx = str.indexOf(';', index)
-		
-			if (endIdx === -1) {
-		  		endIdx = str.length
-			} else if (endIdx < eqIdx) {
-		  		// Procura o primeiro ';'
-		  		index = str.lastIndexOf(';', eqIdx - 1) + 1;
-		  		continue
-			}
-		
-			var key = str.slice(index, eqIdx).trim()
-		
-			// Verifica se ja existe
-			if (undefined === obj[key]) {
-		  		var val = str.slice(eqIdx + 1, endIdx).trim();
-		
-				// Tira o espaco 
-				if (val.charCodeAt(0) === 0x22) {
-					val = val.slice(1, -1)
+		console.log(str);
+		const myCookies = str.split(";");
+		myCookies.forEach((element) =>{
+			// Separa key de value
+			const myCookie = element.split("=");
+			if (myCookie[0] !== undefined || myCookie[1] !== undefined ) {
+				// Verifica se ja existe
+				const key = myCookie[0].trim();
+				if (undefined === obj[key]) {
+					obj[key]=myCookie[1];
 				}
-		
-				obj[key] = val;
 			}
-		
-			index = endIdx + 1;
-		}
+		});
 	}
 	return obj;
 }
@@ -146,8 +124,8 @@ async function GetSession(req) {
 		lang : 'en-US',
 	};
 	// Le os cookies
-	session.cookies = cookies(req.headers['cookie']);
-	console.log(req.headers['cookie']);
+	session.cookies = await cookies(req.headers['cookie']);
+
 	//const lang = headers['accept-language'];
 
 	// Se nao tiver um cookie cria um novo
@@ -171,7 +149,7 @@ async function GetSession(req) {
 
 
 	// Retorna uma nova sessão
-	 console.log(JSON.stringify(session, null, 2));
+	// console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 /****************************************************************************************************/
