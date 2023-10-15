@@ -137,12 +137,11 @@ async function GetSession(req) {
 		hub.del('ses:'+USID);
 		// Cria um novo ID
 		USID = await GetUSID();
-	} else {
-		// Pega o useragent
-		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
-
 	}
 	
+	// Pega o useragent
+	session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
+
 	// Pega os parâmetos se houver
 	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	let path = url.split("?");
@@ -179,7 +178,7 @@ async function GetSession(req) {
 	// Guarda novo ID
 	session.USID = USID;
 	// Guarda último acesso
-	session.startTime = await GetDate();
+	session.lastTime = await GetDate();
 	// Grava a nova sessao no HUB
 	hub.hset('ses:'+USID, session);
 	// Retorna uma nova sessão
@@ -231,7 +230,15 @@ function onRequest(req, res) {
 			}
 		
 			case '/main': {
+				if (undefined === session.login) {
+					res.writeHead(301, { 
+						'content-type': 'text/html; charset=UTF-8',
+						'Location': process.env.WWWBase
+					});
+					res.end(session.path+' - Not found');
 					break;
+				}
+				
 			}
 
 			case '/login': {
