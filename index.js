@@ -94,6 +94,23 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
+async function Parse(myArray) {
+	var obj = {};
+	myArray.forEach((elements) =>{
+		// Separa key de value
+		const element = elements.split("=");
+		if (element[0] !== undefined || element[1] !== undefined ) {
+			// Verifica se ja existe
+			const key = element[0].trim();
+			if (undefined === obj[key]) {
+				obj[key]=element[1];
+			}
+		}
+	});
+	return obj;
+}
+
+
 async function GetSession(req) {
 
 	console.log(req);
@@ -103,6 +120,7 @@ async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
+		get : {},
 		remoteAddress: {},
 		login : '*',
 		map : 'MB',
@@ -110,21 +128,21 @@ async function GetSession(req) {
 		lang : 'en-US',
 	};
 
-	// Le os cookies
+	// Pega o caminho e parâmetos se houver
+	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
+	let path = url.split("?");
+	if (typeof path[1] === 'string') {
+		const myGets = path[1].split("&");
+		session.get = await Parse(myGets);
+	}
+	session.path=path[0];
+
+	// Pega os cookies
 	if (typeof req.headers['cookie'] === 'string') {
 		const myCookies = req.headers['cookie'].split(";");
-		myCookies.forEach((element) =>{
-			// Separa key de value
-			const myCookie = element.split("=");
-			if (myCookie[0] !== undefined || myCookie[1] !== undefined ) {
-				// Verifica se ja existe
-				const key = myCookie[0].trim();
-				if (undefined === session.cookies[key]) {
-					session.cookies[key]=myCookie[1];
-				}
-			}
-		});
+		session.cookies = await Parse(myCookies);
 	}
+
 	// Se nao tiver um cookie de sessao cria um novo
 	if (session.cookies['tk_v'] === undefined) { USID = await GetUSID(); } else {USID = session.cookies['tk_v']}
 	// Verifica se tem uma sessao no HUB
@@ -153,8 +171,6 @@ async function GetSession(req) {
 	session.USID = USID;
 	// Guarda ultimo acesso
 	session.startTime = await GetDate();
-	// Pega o caminho
-	session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	// Grava a nova sessao no HUB
 	hub.hset('ses:'+USID, session);
 	// Retorna uma nova sessão
