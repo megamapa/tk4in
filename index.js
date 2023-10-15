@@ -203,7 +203,7 @@ function onRequest(req, res) {
 
 
 	// Carrega a sessão
-	GetSession(headers).then(session => {
+	//GetSession(headers).then(session => {
 
 /****************************************************************************************************/
 /* Mostra parâmetros e aguarda clientes																*/
