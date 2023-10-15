@@ -94,7 +94,7 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
-function cookies(str) {
+async function cookies(str) {
   
 	var obj = {}
 
@@ -136,13 +136,9 @@ function cookies(str) {
 	return obj;
 }
 
-
-
-
 async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
-		cookies :{},
 		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
 		map : 'MB',
@@ -174,10 +170,8 @@ async function GetSession(req) {
 	hub.hset('ses:'+USID, session);
 
 
-
-
 	// Retorna uma nova sessão
-	// console.log(JSON.stringify(session, null, 2));
+	 console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 /****************************************************************************************************/
@@ -187,7 +181,7 @@ function onRequest(req, res) {
 	// Verifica se a conexão e HTTP/1 ou HTTP/2 e unifica o socket
 	const { socket: { alpnProtocol } } = req.httpVersion === '2.0'?req.stream.session:req;
 	// Carrega a sessão
-	console.log(req);
+	//console.log(req);
 	GetSession(req).then(session => {
 		// Responde
 		switch(session.path) {
@@ -219,7 +213,7 @@ function onRequest(req, res) {
 
 
 
-				
+
 				// Scripts
 				res.write("teste</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script nonce="+nonce+">const es=document.getElementsByName('flip');Array.from(es).forEach(function (e){e.addEventListener('click', function(){document.getElementById('login-box').classList.toggle('flipped');});});document.getElementById('log').addEventListener('click', function(){document.getElementById('content').classList.add('blured');document.getElementById('loader-wrap').style.display='block';});");
 				res.end("</script></body></html>");
