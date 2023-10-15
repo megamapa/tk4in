@@ -113,7 +113,7 @@ async function Parse(myArray) {
 
 async function GetSession(req) {
 
-	console.log(req);
+	//console.log(req);
 
 
 
@@ -174,7 +174,7 @@ async function GetSession(req) {
 	// Grava a nova sessao no HUB
 	hub.hset('ses:'+USID, session);
 	// Retorna uma nova sessão
-	//console.log(JSON.stringify(session, null, 2));
+	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
 /****************************************************************************************************/
