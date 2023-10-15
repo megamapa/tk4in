@@ -94,10 +94,54 @@ server.on('error', (err) => GetDate().then(dte =>{console.log('\033[36m'+dte+': 
 /****************************************************************************************************/
 /* Rotinas do http2																					*/
 /****************************************************************************************************/
+function cookies(str) {
+  
+	var obj = {}
+
+	if (typeof str === 'string') {
+		var index = 0
+		while (index < str.length) {
+			var eqIdx = str.indexOf('=', index)
+  
+			// Nao tiver mais sai
+			if (eqIdx === -1) { break}
+		
+			var endIdx = str.indexOf(';', index)
+		
+			if (endIdx === -1) {
+		  		endIdx = str.length
+			} else if (endIdx < eqIdx) {
+		  		// Procura o primeiro ';'
+		  		index = str.lastIndexOf(';', eqIdx - 1) + 1;
+		  		continue
+			}
+		
+			var key = str.slice(index, eqIdx).trim()
+		
+			// Verifica se ja existe
+			if (undefined === obj[key]) {
+		  		var val = str.slice(eqIdx + 1, endIdx).trim();
+		
+				// Tira o espaco 
+				if (val.charCodeAt(0) === 0x22) {
+					val = val.slice(1, -1)
+				}
+		
+				obj[key] = val;
+			}
+		
+			index = endIdx + 1;
+		}
+	}
+	return obj;
+}
+
+
+
+
 async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
-		startTime: await GetDate(),
 		cookies :{},
 		remoteAddress: {IPv4: '', IPv6: ''},
 		login : '*',
@@ -105,11 +149,9 @@ async function GetSession(req) {
 		mapset : ['MB'],
 		lang : 'en-US',
 	};
-	// Pega o caminho
-	session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	// Le os cookies
-	let str = req['cookie'];
-
+	session.cookies = cookies(req.headers["cookie"]);
+	
 	//const lang = headers['accept-language'];
 
 	// Se nao tiver um cookie cria um novo
@@ -117,14 +159,23 @@ async function GetSession(req) {
 	// Verifica se tem uma sessao no redis
 	if (await hub.exists('ses:'+USID)) {
 		session = await hub.hgetall('ses:'+USID);
-		await hub.del('ses:'+USID);
+		hub.del('ses:'+USID);
 		USID = await GetUSID();
+
 	} else {
-		session.useragent = req['user-agent'];
+		session.startTime = await GetDate();
+		// Pega o useragent
+		session.useragent = req.httpVersion === '2.0'?req.headers['user-agent']:req['user-agent'];
+		// Pega o caminho
+		session.path = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 		//session.ipAddress = req.socket.remoteAddress;
 	}
 	session.USID = USID;
 	hub.hset('ses:'+USID, session);
+
+
+
+
 	// Retorna uma nova sessão
 	// console.log(JSON.stringify(session, null, 2));
 	return(session);
@@ -165,9 +216,13 @@ function onRequest(req, res) {
 				// Block
 				res.write("<div class=loader-wrap id=loader-wrap><div class=blocks><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div></div></div>");
 				// Body
+
+
+
+				
 				// Scripts
 				res.write("teste</body><script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script nonce="+nonce+">const es=document.getElementsByName('flip');Array.from(es).forEach(function (e){e.addEventListener('click', function(){document.getElementById('login-box').classList.toggle('flipped');});});document.getElementById('log').addEventListener('click', function(){document.getElementById('content').classList.add('blured');document.getElementById('loader-wrap').style.display='block';});");
-					res.end("</script></body></html>");
+				res.end("</script></body></html>");
 				break;
 			}
 		
