@@ -99,7 +99,7 @@ async function Parse(myArray) {
 	myArray.forEach((elements) =>{
 		// Separa key de value
 		const element = elements.split("=");
-		if (element[0] !== undefined || element[1] !== undefined ) {
+		if (undefined !== element[0] || undefined !==  element[1]) {
 			// Verifica se ja existe
 			const key = element[0].trim();
 			if (undefined === obj[key]) {
@@ -114,18 +114,11 @@ async function Parse(myArray) {
 async function GetSession(req) {
 
 	//console.log(req);
-
-
-
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
-		get : {},
+		gets : {},
 		remoteAddress: {},
-		login : '*',
-		map : 'MB',
-		mapset : ['MB'],
-		lang : 'en-US',
 	};
 
 	// Pega os cookies
@@ -150,21 +143,34 @@ async function GetSession(req) {
 		//session.ipAddress = req.socket.remoteAddress;
 	}
 
-	// Pega o caminho e parâmetos se houver
+	// Pega os parâmetos se houver
 	let url = req.httpVersion === '2.0'?req.headers[':path']:req.url;
 	let path = url.split("?");
 	if (typeof path[1] === 'string') {
 		const myGets = path[1].split("&");
-		session.get = await Parse(myGets);
+		session.gets = await Parse(myGets);
 	}
+	// Pega o caminho
 	session.path=path[0];
 
 	// Seta a linguagem
-
+	if (undefined !== session.gets['lang']) {
+		session.lang = session.gets['lang'];
+	} else {
+		if (undefined === session.lang) {
+			if (typeof req.headers['accept-language'] === 'string') {
+				let mylang = req.headers['accept-language'].split(",");
+				session.lang = mylang[0];
+			}
+		}
+	}
+	// Verifica se a linguagem e uma da válidas se nao for seta com inglês
+	langs =['pt-BR','en-US','zh-CN'];
+	if ( !langs.includes(session.lang) ) {session.lang='en-US'}
 
 	// Guarda novo ID
 	session.USID = USID;
-	// Guarda ultimo acesso
+	// Guarda último acesso
 	session.startTime = await GetDate();
 	// Grava a nova sessao no HUB
 	hub.hset('ses:'+USID, session);
