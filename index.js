@@ -98,7 +98,7 @@ async function GetSession(req) {
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
-		remoteAddress: {IPv4: '', IPv6: ''},
+		remoteAddress: {IPv4: 'asdasd', IPv6: 'gdfgdfg'},
 		login : '*',
 		map : 'MB',
 		mapset : ['MB'],
@@ -114,6 +114,7 @@ async function GetSession(req) {
 				// Verifica se ja existe
 				const key = myCookie[0].trim();
 				if (undefined === session.cookies[key]) {
+					console.log(key+myCookie[1]);
 					session.cookies[key]=myCookie[1];
 				}
 			}
