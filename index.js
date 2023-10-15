@@ -110,7 +110,6 @@ async function Parse(myArray) {
 	return obj;
 }
 
-
 async function GetSession(req) {
 
 	//console.log(req);
@@ -185,6 +184,20 @@ async function GetSession(req) {
 	console.log(JSON.stringify(session, null, 2));
 	return(session);
 }
+
+async function logout(session,res) {
+	if (undefined !== session.login) {
+		pub.publish('usr:'+session.login,'{"logout":"'+session.USID+'"}');
+	}
+	// Deleta a sessao no HUB
+	hub.del('ses:'+session.USID);
+	// Volta para pagina principal
+	res.writeHead(301, { 
+		'content-type': 'text/html; charset=UTF-8',
+		'Location': process.env.WWWBase
+	});
+	res.end();
+}
 /****************************************************************************************************/
 /* Mensagens do http2																				*/
 /****************************************************************************************************/
@@ -230,18 +243,32 @@ function onRequest(req, res) {
 			}
 		
 			case '/main': {
+				// Se nao estiver logado: volta pra pagina principal
 				if (undefined === session.login) {
-					res.writeHead(301, { 
-						'content-type': 'text/html; charset=UTF-8',
-						'Location': process.env.WWWBase
-					});
-					res.end(session.path+' - Not found');
+					logout(session,res);
 					break;
 				}
-				
+
+
+
+
+
+
+
+				break;
 			}
 
 			case '/login': {
+				// Se ja estiver logado: desloga e volta pra pagina principal
+				if (undefined !== session.login) {
+					logout(session,res);
+					break;
+				}
+
+
+
+
+
 
 				break;
 			}
