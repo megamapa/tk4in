@@ -227,7 +227,7 @@ function onRequest(req, res) {
 				res.writeHead(404, { 
 					'content-type': 'text/html; charset=UTF-8',
 				});
-				res.end(path+' - Not found');
+				res.end(session.path+' - Not found');
 			}
 		}
 	});
