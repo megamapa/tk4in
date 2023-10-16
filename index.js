@@ -118,6 +118,7 @@ async function GetSession(req) {
 		cookies : {},
 		gets : {},
 		remoteAddress: {},
+		err : 0,
 	};
 
 	// Pega os cookies
@@ -234,7 +235,7 @@ function onRequest(req, res) {
 				// Block
 				res.write("<div class=loader-wrap id=loader-wrap><div class=blocks><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div></div></div>");
 				// Body
-				res.write("<section id=content class=login-content><div id=login-box class='login-box"+session.err === 4 ? " flipped":""+"><form class=login-form action=login method=post name=logform'><h3 class=login-head><i class='fa fa-fw fa-lg fa-user'></i>"+session._LOGIN+"</h3><div class=qr-form id=qrid><div class=form-group><label for=login>"+lang._NAME+"</label><input class=form-control name=login id=login value='"+session.name !== undefined?session.name:""+"'");
+				res.write("<section id=content class=login-content><div id=login-box class='login-box"+session.err === 4 ? " flipped":""+"><form class=login-form action=login method=post name=logform'><h3 class=login-head><i class='fa fa-fw fa-lg fa-user'></i>"+lang._LOGIN+"</h3><div class=qr-form id=qrid><div class=form-group><label for=login>"+lang._NAME+"</label><input class=form-control name=login id=login value='"+session.name !== undefined?session.name:""+"'");
 
 				if (undefined !== session.err) {
 					res.write(" data-bs-toggle='popover' data-bs-placement='top' data-bs-trigger='manual' data-bs-title='");
