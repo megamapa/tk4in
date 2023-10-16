@@ -261,12 +261,6 @@ function onRequest(req, res) {
 					break;
 				}
 
-
-
-
-
-
-
 				break;
 			}
 
