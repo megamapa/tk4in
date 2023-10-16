@@ -15,6 +15,8 @@ let constants = {
     _SEND           : 'ENTRAR',
     _CLOSE          : 'FECHAR',
 
+    _FORGOTPASS     : 'Esqueceu a senha ?',
+    _EMAIL          : 'E-Mail',
     _SEND2          : 'ENVIE PARA O E-MAIL ACIMA',
     _BACK           : 'Voltar ao login.',
     _DBERR          : 'Banco de dados inválido.',
