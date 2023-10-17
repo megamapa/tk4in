@@ -112,7 +112,7 @@ async function Parse(myArray) {
 
 async function GetSession(req) {
 
-	console.log(req);
+	console.log(req.rawTrailers);
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
@@ -238,7 +238,7 @@ function onRequest(req, res) {
 				// Body
 				res.write("<section id=content class=login-content><div id=login-box class='login-box"+(session.err === 4 ? " flipped":"")+"'><form class=login-form action=login method=post name=logform'><h3 class=login-head><i class='fa fa-fw fa-lg fa-user'></i>"+lang._LOGIN+"</h3><div class=qr-form id=qrid><div class=form-group><label for=login>"+lang._NAME+"</label><input class=form-control name=login id=login value='"+session.name+"'");
 
-				if (undefined !== session.err) {
+				if (0 !== session.err) {
 					res.write(" data-bs-toggle='popover' data-bs-placement='top' data-bs-trigger='manual' data-bs-title='");
 					switch(session.err) {
 						case 1 : { res.write(lang._LOGERR); break}
