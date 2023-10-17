@@ -112,7 +112,10 @@ async function Parse(myArray) {
 
 async function GetSession(req) {
 
-	console.log(req.rawTrailers);
+	console.log(req.body);
+
+
+
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
