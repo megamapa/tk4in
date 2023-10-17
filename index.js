@@ -112,7 +112,7 @@ async function Parse(myArray) {
 
 async function GetSession(req) {
 
-	console.log(req.body);
+
 
 
 
@@ -276,9 +276,9 @@ function onRequest(req, res) {
 					break;
 				}
 
+				console.log(req.body);
 
-
-
+				logout(session,res);
 
 
 				break;
