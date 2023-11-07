@@ -1,4 +1,4 @@
-// constants.js
+// index.js
 
 'use strict';
 
