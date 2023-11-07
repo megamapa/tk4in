@@ -289,8 +289,8 @@ function onRequest(req, res) {
 				res.write("<div id='gnssgroup' class='gnssgroup'>");
 
 				// GPS
-				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GPS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgps'>");
-   <?php
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>20"+lang._GPS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgps'>");
+ /*  <?php
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/20/&apiKey='+process.env.N2_KEY);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -301,51 +301,21 @@ function onRequest(req, res) {
 	foreach ($result["above"] as $sigla => $nome) {
 		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
 	}
-  ?>
-  				res.write("</div></div>"); 7cZVX98tfx
+  ?>*/
+  				res.write("</div></div>");
 
-			// GLONASS
-			res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GLONASS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>
-	<?php echo '<div class="col-5 gnssline">'._NAME.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LAT.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LONG.'</div><div class="col-3 gnssline">'._DESIGNATOR.'</div>';?>
- </div>
- <div class="row row-cols-4" id="gnssglonass">
-  <?php
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/21/&apiKey='.N2_KEY);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	$response = curl_exec($ch);
-	$result = json_decode($response,true);
-	curl_close($ch); // Close the connection
+				// GLONASS
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>21"+lang._GLONASS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>");
 	
-	foreach ($result["above"] as $sigla => $nome) {
-		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
-	}
-	?>
- </div>
-</div>
+				res.write("</div></div>");
 
 
-			// BEIDOU
-			res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._BEIDOU+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>
-	<?php echo '<div class="col-5 gnssline">'._NAME.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LAT.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LONG.'</div><div class="col-3 gnssline">'._DESIGNATOR.'</div>';?>
- </div>
- <div class="row row-cols-4" id="gnssbeidou">
-<?php
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/35/&apiKey='.N2_KEY);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	$response = curl_exec($ch);
-	$result = json_decode($response,true);
-	curl_close($ch); // Close the connection
+				// BEIDOU
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>35"+lang._BEIDOU+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>");
 	
-	foreach ($result["above"] as $sigla => $nome) {
-		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
-	}
-?>
- </div>
-</div>
+				res.write("</div></div></div>");
 
-</div>
+
 
 
 
