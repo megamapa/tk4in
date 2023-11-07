@@ -111,11 +111,7 @@ async function Parse(myArray) {
 }
 
 async function GetSession(req) {
-
-
-
-
-
+	
 	// Inicializa a sessao
 	let	session = {
 		cookies : {},
@@ -234,7 +230,7 @@ function onRequest(req, res) {
 					'x-xss-protection': '1; mode=block' });
 				// Le a linguagem
 				let lang = require('./lang/'+session.lang+'/index');
-				// Header
+				// Html
 				res.write("<!DOCTYPE html><html itemscope itemtype='http://schema.org/WebSite'; lang="+session.lang+"><head><meta name='viewport' content='width=device-width, initial-scale=1'><meta charset=utf-8><title itemprop=name>"+lang._TITLE+"</title><link rel=dns-prefetch href="+process.env.CDNBase+"><link rel=canonical href="+process.env.WWWBase+" itemprop=url><link rel=icon href='"+process.env.CDNBase+"img/logo.png' itemprop=image><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-regular-400.woff2' as=font type='font/woff2' crossorigin=anonymous><link rel=preload href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/webfonts/fa-solid-900.woff2' as=font type='font/woff2' crossorigin=anonymous><meta name=description content='"+lang._DESCRIPTION+"' itemprop=description><meta name=keywords content='"+lang._KEYWORDS+"'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous><link href='"+process.env.CDNBase+"css/style.css' rel=stylesheet crossorigin=anonymous></head><body>");
 				// Block
 				res.write("<div class=loader-wrap id=loader-wrap><div class=blocks><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div><div class=block></div></div></div>");
@@ -261,11 +257,106 @@ function onRequest(req, res) {
 		
 			case '/main': {
 				// Se nao estiver logado: volta pra pagina principal
-				if (undefined === session.login) {
+				if (undefined !== session.login) {
 					logout(session,res);
 					break;
 				}
+				nonce = randomBytes(16).toString('hex');
+				res.writeHead(200, { 
+					'access-control-allow-methods': 'GET,POST',
+					'access-control-allow-origin': "'"+process.env.WWWBase+"'",
+					'cache-control': 'no-cache',
+					'content-Security-Policy': "default-src 'self'; base-uri 'self'; script-src 'report-sample' 'nonce-"+nonce+"' 'self' 'unsafe-eval' cdnjs.cloudflare.com/ajax/libs/socket.io/ cdn.jsdelivr.net/npm/ api.mapbox.com/ www.gstatic.com/draco/ "+process.env.CDNBase+"; style-src 'self' 'unsafe-hashes' 'unsafe-inline' 'report-sample' https://fonts.googleapis.com/ https://fonts.gstatic.com/ cdn.jsdelivr.net/npm/ api.mapbox.com/ "+process.env.CDNBase+"; object-src 'none'; frame-src 'self'; frame-ancestors 'none'; child-src 'self'; img-src 'self' data: https: "+process.env.CDNBase+"; font-src  https://fonts.gstatic.com/ https://fonts.googleapis.com/ cdnjs.cloudflare.com/ajax/libs/font-awesome/; connect-src 'self' blob: *.mapbox.com/ www.gstatic.com/draco/ http://"+process.env.HUBIP+"/ ws://"+process.env.HUBIP+"/ "+process.env.CDNBase+"; form-action 'self'; media-src 'self'; worker-src 'self' blob: https: "+process.env.CDNBase,
+					'content-type': 'text/html; charset=UTF-8',
+					'date': new Date().toUTCString(),
+					'permissions-policy': 'geolocation=(self "'+process.env.WWWBase+'")',
+					'referrer-policy': "no-referrer-when-downgrade",
+					'set-cookie': 'tk_v='+session.USID+'; Domain='+process.env.CKEBase+'; Path=/; Secure; HttpOnly',
+					'strict-transport-security':'max-age=31536000; includeSubDomains; preload',
+					'vary': 'Accept-Encoding',
+					'x-content-type-options': 'nosniff',
+					'x-frame-options': 'DENY',
+					'x-permitted-cross-domain-policies': 'none',
+					'x-xss-protection': '1; mode=block' });
+				// Le a linguagem
+				let lang = require('./lang/'+session.lang+'/main');
+				// Html
+				res.write("<!DOCTYPE html><html lang="+session.lang+" data-footer='true' data-override='{'attributes': {'placement': 'vertical','layout': 'fluid' }, 'showSettings':false, 'storagePrefix': '"+process.env.AppID+"'}'><head><meta charset=utf-8><title><?php echo _TITLE;?></title><link rel='dns-prefetch' href="+process.env.CDNBase+"><link rel=icon href='"+process.env.CDNBase+"img/logo.png'><meta name='viewport' content='width=device-width, initial-scale=1'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Sarala:wght@700&display=swap' rel='stylesheet'><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous>");
+				res.write("<link rel=stylesheet href='https://api.mapbox.com/mapbox-gl-js/v3.0.0-beta.5/mapbox-gl.css' crossorigin=anonymous>");
+				res.write("<link rel=stylesheet href='"+process.env.CDNBase+"css/main.css#"+nonce+"' crossorigin=anonymous></head><body><div class='baroff' id='baroff'>"+lang._WAITCONECT+"</div>");
 
+				// GNSS Desktop
+				res.write("<div id='gnssgroup' class='gnssgroup'>");
+
+				// GPS
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GPS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgps'>");
+   <?php
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/20/&apiKey='+process.env.N2_KEY);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	$result = json_decode($response,true);
+	curl_close($ch); // Close the connection
+	
+	foreach ($result["above"] as $sigla => $nome) {
+		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
+	}
+  ?>
+  				res.write("</div></div>"); 7cZVX98tfx
+
+			// GLONASS
+			res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GLONASS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>
+	<?php echo '<div class="col-5 gnssline">'._NAME.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LAT.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LONG.'</div><div class="col-3 gnssline">'._DESIGNATOR.'</div>';?>
+ </div>
+ <div class="row row-cols-4" id="gnssglonass">
+  <?php
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/21/&apiKey='.N2_KEY);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	$result = json_decode($response,true);
+	curl_close($ch); // Close the connection
+	
+	foreach ($result["above"] as $sigla => $nome) {
+		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
+	}
+	?>
+ </div>
+</div>
+
+
+			// BEIDOU
+			res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._BEIDOU+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'>
+	<?php echo '<div class="col-5 gnssline">'._NAME.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LAT.'</div><div class="col-2 gnssline d-flex flex-row-reverse">'._LONG.'</div><div class="col-3 gnssline">'._DESIGNATOR.'</div>';?>
+ </div>
+ <div class="row row-cols-4" id="gnssbeidou">
+<?php
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/35/&apiKey='.N2_KEY);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	$result = json_decode($response,true);
+	curl_close($ch); // Close the connection
+	
+	foreach ($result["above"] as $sigla => $nome) {
+		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
+	}
+?>
+ </div>
+</div>
+
+</div>
+
+
+
+
+				// Content
+				res.write("<div id='content' class='content d-none'><div class='search_div noselect'><div id='barsid' class='bars_icon noselect'><i class='fa fa-fw fa-bars'></i></div><input id='searchbox' type='search' placeholder='"+lang._SEARCH+"' /><div class='search_icon noselect'><i class='fa fa-fw fa-search'></i></div></div><div class='controls'><div class='switch_style'><img id='street_style' alt='Street layer' src='"+process.env.CDNBase+"img/street.jpg'><img id='satellite_style' alt='Satellie layer' class='d-none' src='"+process.env.CDNBase+"img/satellite.jpg'></div></div></div>");
+				res.write("<div id='map' class='map'></div>");
+				// Scripts
+				res.write("<script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js' integrity='sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H' crossorigin=anonymous></script>");
+				res.write("<script async src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-beta.5/mapbox-gl.js' crossorigin=anonymous></script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
+				res.end("</body></html>");
 				break;
 			}
 
