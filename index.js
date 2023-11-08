@@ -255,7 +255,7 @@ function onRequest(req, res) {
 				break;
 			}
 		
-			case '/main2': {
+			case '/main': {
 				// Se nao estiver logado: volta pra pagina principal
 				if (undefined !== session.login) {
 					logout(session,res);
@@ -281,7 +281,7 @@ function onRequest(req, res) {
 				// Le a linguagem
 				let lang = require('./lang/'+session.lang+'/main');
 				// Html
-				res.write("<!DOCTYPE html><html lang="+session.lang+" data-footer='true' data-override='{'attributes': {'placement': 'vertical','layout': 'fluid' }, 'showSettings':false, 'storagePrefix': '"+process.env.AppID+"'}'><head><meta charset=utf-8><title><?php echo _TITLE;?></title><link rel='dns-prefetch' href="+process.env.CDNBase+"><link rel=icon href='"+process.env.CDNBase+"img/logo.png'><meta name='viewport' content='width=device-width, initial-scale=1'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Sarala:wght@700&display=swap' rel='stylesheet'><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous>");
+				res.write("<!DOCTYPE html><html lang="+session.lang+" data-footer='true' data-override='{'attributes': {'placement': 'vertical','layout': 'fluid' }, 'showSettings':false, 'storagePrefix': '"+process.env.AppID+"'}'><head><meta charset=utf-8><title>"+lang._TITLE+"</title><link rel='dns-prefetch' href="+process.env.CDNBase+"><link rel=icon href='"+process.env.CDNBase+"img/logo.png'><meta name='viewport' content='width=device-width, initial-scale=1'><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Sarala:wght@700&display=swap' rel='stylesheet'><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css' rel=stylesheet integrity='sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9' crossorigin=anonymous>");
 				res.write("<link rel=stylesheet href='https://api.mapbox.com/mapbox-gl-js/v3.0.0-beta.5/mapbox-gl.css' crossorigin=anonymous>");
 				res.write("<link rel=stylesheet href='"+process.env.CDNBase+"css/main.css#"+nonce+"' crossorigin=anonymous></head><body><div class='baroff' id='baroff'>"+lang._WAITCONECT+"</div>");
 
@@ -325,7 +325,7 @@ function onRequest(req, res) {
 				res.write("<div id='map' class='map'></div>");
 				// Scripts
 				res.write("<script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script async src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js' integrity='sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H' crossorigin=anonymous></script>");
-				res.write("<script async src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-beta.5/mapbox-gl.js' crossorigin=anonymous></script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
+				res.write("<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-beta.5/mapbox-gl.js' crossorigin=anonymous></script><script>accessToken="+process.env.accessToken+";</script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
 				res.end("</body></html>");
 				break;
 			}
