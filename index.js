@@ -255,7 +255,7 @@ function onRequest(req, res) {
 				break;
 			}
 		
-			case '/main': {
+			case '/main3': {
 				// Se nao estiver logado: volta pra pagina principal
 				if (undefined !== session.login) {
 					logout(session,res);
