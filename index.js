@@ -287,45 +287,21 @@ function onRequest(req, res) {
 
 				// GNSS Desktop
 				res.write("<div id='gnssgroup' class='gnssgroup'>");
-
 				// GPS
-				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>20"+lang._GPS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgps'>");
- /*  <?php
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL,'https://api.n2yo.com/rest/v1/satellite/above/-23.513346/-46.631134/0/70/20/&apiKey='+process.env.N2_KEY);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	$response = curl_exec($ch);
-	$result = json_decode($response,true);
-	curl_close($ch); // Close the connection
-	
-	foreach ($result["above"] as $sigla => $nome) {
-		echo '<div class="col-5 gnssline">'.$nome["satname"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlat"].'</div><div class="col-2 gnssline d-flex flex-row-reverse">'.$nome["satlng"].'</div><div class="col-3 gnssline">'.$nome["intDesignator"].'</div>';
-	}
-  ?>*/
-  				res.write("</div></div>");
-
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GPS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgps'></div></div>");
 				// GLONASS
-				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>21"+lang._GLONASS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssglonass'>");
-	
-				res.write("</div></div>");
-
-
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GLONASS+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssglonass'></div></div>");
 				// BEIDOU
-				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>35"+lang._BEIDOU+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssbeidou'>");
-	
-				res.write("</div></div></div>");
-
-
-
-
-
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._BEIDOU+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssbeidou'></div></div>");
+				// GALILEO
+				res.write("<div class='gnsstit'><i class='fa fa-fw fa-satellite'></i>"+lang._GALILEO+"</div><div class='gnssbox'><div class='row row-cols-4 gnsshead'><div class='col-5 gnssline'>"+lang._NAME+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LAT+"</div><div class='col-2 gnssline d-flex flex-row-reverse'>"+lang._LONG+"</div><div class='col-3 gnssline'>"+lang._DESIGNATOR+"</div></div><div class='row row-cols-4' id='gnssgalileo'></div></div></div>");
 
 				// Content
 				res.write("<div id='content' class='content d-none'><div class='search_div noselect'><div id='barsid' class='bars_icon noselect'><i class='fa fa-fw fa-bars'></i></div><input id='searchbox' type='search' placeholder='"+lang._SEARCH+"' /><div class='search_icon noselect'><i class='fa fa-fw fa-search'></i></div></div><div class='controls'><div class='switch_style'><img id='street_style' alt='Street layer' src='"+process.env.CDNBase+"img/street.jpg'><img id='satellite_style' alt='Satellie layer' class='d-none' src='"+process.env.CDNBase+"img/satellite.jpg'></div></div></div>");
 				res.write("<div id='map' class='map'></div>");
 				// Scripts
 				res.write("<script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js' integrity='sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H' crossorigin=anonymous></script>");
-				res.write("<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-rc.1/mapbox-gl.js' crossorigin=anonymous></script><script nonce="+nonce+">const accessToken='"+process.env.accessToken+"';const cdnAddr='"+process.env.CDNBase+"';const hubAddr='"+process.env.HUBAddr+"';</script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
+				res.write("<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-rc.1/mapbox-gl.js' crossorigin=anonymous></script><script nonce="+nonce+">const accessToken='"+process.env.accessToken+"';const cdnAddr='"+process.env.CDNBase+"';const hubAddr='"+process.env.HUBAddr+"';const n2yoKey='"+process.env.N2_KEY+"';</script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
 				res.end("</body></html>");
 				break;
 			}
