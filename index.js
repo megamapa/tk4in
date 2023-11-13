@@ -301,7 +301,7 @@ function onRequest(req, res) {
 				res.write("<div id='map' class='map'></div>");
 				// Scripts
 				res.write("<script async src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm' crossorigin=anonymous></script><script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js' integrity='sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H' crossorigin=anonymous></script>");
-				res.write("<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-rc.1/mapbox-gl.js' crossorigin=anonymous></script><script nonce="+nonce+">const accessToken='"+process.env.accessToken+"';const cdnAddr='"+process.env.CDNBase+"';const hubAddr='"+process.env.HUBAddr+"';const n2yoKey='"+process.env.N2_KEY+"';</script><script defer src='"+process.env.CDNBase+"/js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
+				res.write("<script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0-rc.1/mapbox-gl.js' crossorigin=anonymous></script><script nonce="+nonce+">const accessToken='"+process.env.accessToken+"';const cdnAddr='"+process.env.CDNBase+"';const hubAddr='"+process.env.HUBAddr+"';const n2yoKey='"+process.env.N2_KEY+"';</script><script defer src='"+process.env.CDNBase+"js/mb.js#"+nonce+"' crossorigin=anonymous></script>");
 				res.end("</body></html>");
 				break;
 			}
