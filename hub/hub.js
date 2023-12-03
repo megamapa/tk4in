@@ -110,7 +110,7 @@ setInterval(function() {
 /* 	Show parameters and waiting clients																*/
 /****************************************************************************************************/
 const OS = require('os');
-const { GetDate } = require('../utils/utils.js')
+import { GetDate } from '../utils/utils.js';
 GetDate().then(dte => {
 	// Save start datetime
 	starttime = Date.parse(dte);
