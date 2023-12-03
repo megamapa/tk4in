@@ -11,7 +11,7 @@ async function getDate() {
 
 //import { randomBytes } from "node:crypto"
 
-function randomNum(min, max) {  
+async function RandomNum(min, max) {  
 	return Math.floor( Math.random() * (max - min) + min)
 }
 
@@ -25,6 +25,4 @@ async function getUSID() {
 	return('TK-'+Version+'.'+res1+'.'+res2+'.'+res3+'.'+res4+'.'+res5);
 }
 
-module.exports = {
-	getDate
-}
+module.exports = { getDate, getUSID }
