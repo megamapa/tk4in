@@ -5,6 +5,7 @@
 process.title = 'hub';
 const Version = 'v1.0.0';
 
+const {getDate} = require('../utils/utils.js')
 /****************************************************************************************************/
 /* Read enviroment variables																		*/
 /****************************************************************************************************/
@@ -46,14 +47,14 @@ const pub = new Redis({host:process.env.RD_host, port:process.env.RD_port, passw
 
 // Publica STATUS
 async function PublishUpdate() {
-	GetDate().then(dte => {
+	getDate().then(dte => {
 		let uptime = Date.parse(dte) - starttime;
 		pub.publish('san:server_update','{"name":"'+process.title+'","version":"'+Version+'","ipport":"'+process.env.HUBIP+':'+process.env.HUBPort+'","uptime":"'+Math.floor(uptime/60000)+'"}');
 	});
 }
 
 // Updates server status as soon as it successfully connects
-hub.on('connect', function () { PublishUpdate(); GetDate().then(dte =>{ console.log('\u001b[36m'+dte+': \u001b[32mHUB connected.\u001b[0;0m');
+hub.on('connect', function () { PublishUpdate(); getDate().then(dte =>{ console.log('\u001b[36m'+dte+': \u001b[32mHUB connected.\u001b[0;0m');
 																		console.log('\u001b[36m'+dte+': \u001b[32mWaiting clients...\u001b[0;0m');}); });
 
 // Subscribe on chanels
@@ -110,8 +111,8 @@ setInterval(function() {
 /* 	Show parameters and waiting clients																*/
 /****************************************************************************************************/
 const OS = require('os');
-import { GetDate } from '../utils/utils.js';
-GetDate().then(dte => {
+
+getDate().then(dte => {
 	// Save start datetime
 	starttime = Date.parse(dte);
 	// Show parameters and waiting clients
